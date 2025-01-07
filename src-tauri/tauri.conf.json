@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "roi",
+  "version": "1.0.0",
+  "identifier": "com.roi.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "ROI 计算器与推广盈亏计算器",
+        "width": 620,
+        "height": 900,
+        "minHeight": 900,
+        "minWidth": 620,
+        "maxHeight": 900,
+        "maxWidth": 620,
+        "resizable": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+   
+    "createUpdaterArtifacts": true    
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI1NUI1MEY1OEJGOThEOUQKUldTZGpmbUw5VkJiSlNGMXdzaXlKN2lGUFpqei90R1pCV1JBNFFOSldBNWxBa1E3eG14cHM4S1EK",
+      "endpoints": [
+        "http://sppm1aqap.hd-bkt.clouddn.com/update.json"
+      ],
+      "dangerousInsecureTransportProtocol":true
+    } 
+  }
+}
