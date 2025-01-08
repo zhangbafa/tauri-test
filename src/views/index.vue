@@ -31,20 +31,17 @@ const checkVersion = async () => {
           download.value = '下载完成，点击确定重启更新';
           break;
       }
-    });
+    })
 
     console.log('update installed');
 
   }
 }
 checkVersion()
-
-
-
 const handleOk = async () => {
   visible.value = false;
   await relaunch();
-};
+}
 const handleCancel = () => {
   visible.value = false;
 }
@@ -69,7 +66,7 @@ const handleCancel = () => {
     <template #title>
       更新提示
     </template>
-    <div>有新的更新可用 {{}}</div>
+    <div>有新的更新可用 {{ download }}</div>
   </a-modal>
 </template>
 
