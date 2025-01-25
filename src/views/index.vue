@@ -55,12 +55,7 @@ const handleCancel = () => {
       </template>
       <Shop />
     </a-tab-pane>
-    <a-tab-pane key="2">
-      <template #title>
-        <icon-bar-chart /> 达人版
-      </template>
-      <Daren />
-    </a-tab-pane>
+   
   </a-tabs>
   <a-modal v-model:visible="visible" @ok="handleOk" @cancel="handleCancel">
     <template #title>
@@ -77,3 +72,6 @@ const handleCancel = () => {
   font-size: 16px;
 }
 </style>
+$env:TAURI_SIGNING_PRIVATE_KEY="dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5ClJXUlRZMEl5eGhDWUxPMGtBWExZa0RMZllCcGgreHk1dlZycVNIMDBxTFpqMnNLVE94b0FBQkFBQUFBQUFBQUFBQUlBQUFBQUhNQnFFQmVKWk1Idks5QnQ1ZmlnV2V5Zm5YVmpQZjVQUkZsY09iVVF0bWFwbFpRYXJKejVzVFNQRzZBVC9UOGxrNHpwUGt6UzF5TEViSmRBWGtacURyRGNuMzBMVkorK2s3QjJIQVl6QU9tOGQvcG05cW54N2pYOXd2Y1pWckRsbkVtU2FRdHJwaUU9Cg=="
+# optionally also add a password
+$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD="fgmkf@qq.com"

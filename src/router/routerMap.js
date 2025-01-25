@@ -14,7 +14,36 @@ const constantRouterMap = [
       {
         path: "/index",
         name: "Index",
-        component: () => import("@/views/index.vue"),
+        component: () => import("@/views/hudong.vue"),
+        meta: {
+          ignoreCache: false,
+        },
+      },
+    ],
+  },
+  {
+    path: "/goods",
+    name: "goods",
+    component: Layout,
+    children: [
+      {
+        path: "/goods",
+        name: "Goods",
+        component: () => import("@/views/goods.vue"),
+        meta: {
+          ignoreCache: false,
+        },
+      },
+    ],
+  },
+  {
+    path: "/video",
+    name: "video",
+    children: [
+      {
+        path: "/video",
+        name: "Video",
+        component: () => import("@/views/video.vue"),
         meta: {
           ignoreCache: false,
         },

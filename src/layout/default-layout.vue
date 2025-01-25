@@ -1,7 +1,6 @@
 <template>
   <a-layout>
     <a-layout-content style="padding: 10px">
-      
         <router-view v-slot="{ Component, route }">
           <transition>
           <component :is="Component" :key="route.fullPath" />

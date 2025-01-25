@@ -12,18 +12,14 @@
   "app": {
     "windows": [
       {
-        "title": "ROI 计算器与推广盈亏计算器",
-        "width": 620,
-        "height": 900,
-        "minHeight": 900,
-        "minWidth": 620,
-        "maxHeight": 900,
-        "maxWidth": 620,
-        "resizable": false
+        "title": "畅语AI智播",
+        "width": 1200,
+        "height": 1100,
+        "resizable": true
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self' https://github.com; img-src 'self' https: data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://github.com; style-src 'self' 'unsafe-inline' https://github.com;"
     }
   },
   "bundle": {
@@ -43,9 +39,10 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI1NUI1MEY1OEJGOThEOUQKUldTZGpmbUw5VkJiSlNGMXdzaXlKN2lGUFpqei90R1pCV1JBNFFOSldBNWxBa1E3eG14cHM4S1EK",
       "endpoints": [
-        "https://github.com/zhangbafa/tauri-test/releases/download/app-v0.1.1/latest.json"
+        "https://github.com/zhangbafa/tauri-test/releases/download/app-v0.1.0/latest.json"
       ],
       "dangerousInsecureTransportProtocol":true
     } 
   }
+  
 }

@@ -73,7 +73,7 @@
               <a-button html-type="submit" type="primary">立即计算</a-button>
               <a-button @click="$refs.formRef.resetFields()">重置</a-button>
               <a-button type="text">保本ROI为: {{ breakEvenROI }}</a-button>
-              <a-button type="text" @click="updateApp">利润率为: {{ profitMargin }}%</a-button>
+              <a-button type="text">利润率为: {{ profitMargin }}%</a-button>
           </a-space>
       </div>
   </a-form>
