@@ -15,23 +15,18 @@ let webview;
 const createNewWindow = async () => {
     console.log('开始创建新窗口');
     try {
-        webview = new WebviewWindow('goods', {
-            url: '#/goods', // 修改为相对路径或本地路由
-            title: '新窗口',
-            width: 800,
-            height: 600,
+        webview = new WebviewWindow('video', {
+            url: '#/video', // 修改为相对路径或本地路由
+            title: '畅语智景',
+            width: 1080/2,
+            height: 1920/2,
             center: true,
             transparent: true,
             decorations: true,
-            alwaysOnTop: true,
+            alwaysOnTop: false,
             resizable: true,
             fullscreen: false,
-            dragDropEnabled: true,
-            alwaysOnTop: true,
-            alwaysOnTop: true,
-            alwaysOnTop: true,
-            backgroundColor: '#000000',
-            
+            dragDropEnabled: true
         });
 
         webview.emit('tauri://created');

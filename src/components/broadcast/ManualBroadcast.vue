@@ -1,5 +1,5 @@
 <template>
-  <a-card style="margin-top: 20px">
+  <a-card style="margin-top: 10px">
     <a-input type="text" v-model="inputText" placeholder="请输入播报内容 回车发送" @press-enter="handleBroadcast" allow-clear />
   </a-card>
 </template>

@@ -49,7 +49,7 @@ class LoopAudio {
     }
 
     handleAudioEnd() {
-        // 音频播放结束的处理逻辑（如果需要）
+        // 音频播放结束的处理逻铛播放结束')
     }
 
     stop() {

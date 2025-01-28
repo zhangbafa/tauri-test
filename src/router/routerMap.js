@@ -14,7 +14,22 @@ const constantRouterMap = [
       {
         path: "/index",
         name: "Index",
-        component: () => import("@/views/hudong.vue"),
+        component: () => import("@/views/dashboard.vue"),
+        meta: {
+          ignoreCache: false,
+        },
+      },
+    ],
+  },
+  {
+    path: "/dashboard",
+    name: "dashboard",
+    component: Layout,
+    children: [
+      {
+        path: "/dashboard",
+        name: "Dashboard",
+        component: () => import("@/views/dashboard.vue"),
         meta: {
           ignoreCache: false,
         },

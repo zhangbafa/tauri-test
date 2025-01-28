@@ -3,7 +3,7 @@
         <a-col :span="16">
 
             <a-list :virtualListProps="{
-                height: 573,
+                height: 400,
             }" :data="commentList">
                 <template #item="{ item, index }">
                     <a-list-item :key="item.msgId">
@@ -29,7 +29,7 @@
         <a-col :span="8" style="position: relative;">
 
             <a-list :data="assistant_reply" :virtualListProps="{
-                height: 560,
+                height: 400,
             }" >
                 <template #item="{ item, index }">
                     <a-list-item :key="item.id">
@@ -40,9 +40,9 @@
                     </a-list-item>
                 </template>
             </a-list>
-            <div style="position: absolute;right: 10px;bottom: -30px;cursor: pointer;">
+            <!-- <div style="position: absolute;right: 10px;bottom: -30px;cursor: pointer;">
                 <icon-sync :size="22" @click="handleRefresh" @hover="handleRefresh" />
-            </div>
+            </div> -->
         </a-col>
     </a-row>
 
@@ -94,7 +94,6 @@ const handlePlayHudong = async (item) => {
             text = item.content
             break
     }
-    // console.log(text)
     const model_id = selectedModels.value?.assistant_model ?? 0
     const audioBlob = await fetchSpeech(text, model_id)
     await playBlob(audioBlob)

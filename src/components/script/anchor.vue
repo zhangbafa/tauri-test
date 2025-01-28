@@ -1,9 +1,9 @@
 <template>
-  <a-layout>
-    <a-layout-content>
-      <div class="container" v-for="(item, index) of anchor_script" :key="item.id">
+      <a-row>
+        <a-col :span="16">
+          <div class="container" v-for="(item, index) of anchor_script" :key="item.id">
         <div style="width: 80px;">话术{{ index + 1 }}</div>
-        <div style="margin: 0 auto;width: 85%;">
+        <div style="margin: 0 auto;width: 85%;padding-top:5px">
           <a-textarea v-model="item.content" placeholder="请输入主播话术" :max-length="200" auto-size allow-clear show-word-limit/>
         </div>
         <div>
@@ -20,22 +20,21 @@
         </div>
       </div>
       
-      <div style="display: flex;justify-content: center;width: 90%;margin: 10px auto;">
-        <a-button @click="handleAdd" type="primary" long >添加话术</a-button>
+      <div style="display: flex;justify-content: center;margin: 10px auto;">
+        <a-button @click="handleAdd" type="outline"  long >添加话术</a-button>
       </div>
-    </a-layout-content>
-
-  </a-layout>
+        </a-col>
+        <a-col :span="7" :offset="1">
+          AI 提示词模版：
+        </a-col>
+      </a-row>
 </template>
 <script setup>
 import { ref, reactive } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import dbManager from '@/db/index.js'
 
-const form = reactive({
-  name: '',
-  posts: [{ value: '' },{ value: '' }]
-})
+
 const handleAdd = async () => {
   try {
     const data = {

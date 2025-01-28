@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Video Playback with Random Text</title>
+</head>
+
+<body>
+    <!-- 视频元素 -->
+    <video id="video" src="src/assets/tik.mp4" controls></video>
+    <!-- 画布元素 -->
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 生成随机文字的函数
+        function generateRandomText() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            const length = Math.floor(Math.random() * 100) + 1; // 随机长度 1 - 10
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                result += characters.charAt(randomIndex);
+            }
+            return result;
+        }
+        // 生成随机颜色的函数
+        function generateRandomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            const alpha = Math.random(); // 随机透明度
+            return `rgba(${r}, ${g}, ${b}, 1)`;
+        }
+
+        video.addEventListener('play', function () {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            function drawFrame() {
+                if (!video.paused && !video.ended) {
+                    // 绘制视频帧
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // 生成随机文字
+                    const randomText = generateRandomText();
+
+                    // 设置文字样式
+                    // ctx.font = '70px Arial';
+                    // ctx.fillStyle = 'white';
+                    const alpha = 1; // 透明度值范围 0.0 - 1.0
+                    ctx.font = '50px Arial';
+                    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                    // 随机位置
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+
+                    // 绘制随机文字
+                    ctx.fillText(randomText, x, y);
+                    // 继续绘制下一帧
+                    // 生成随机方块
+                    const squareX = Math.random() * canvas.width;
+                    const squareY = Math.random() * canvas.height;
+                    const squareWidth = Math.random() * 100 + 20; // 随机宽度 20 - 120
+                    const squareHeight = Math.random() * 100 + 20; // 随机高度 20 - 120
+                    const squareColor = generateRandomColor();
+
+                    ctx.fillStyle = squareColor;
+                    ctx.fillRect(squareX, squareY, squareWidth, squareHeight);
+                    requestAnimationFrame(drawFrame);
+                }
+            }
+
+            drawFrame();
+        });
+    </script>
+</body>
+
+</html>

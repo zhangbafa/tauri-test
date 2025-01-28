@@ -51,10 +51,13 @@ export function useForWithDelay() {
     } else if (hour > 12 && hour < 18) {
       hour_str = '下午';
       hour = hour - 12
+      if(hour==2){
+        hour = '两'
+      }
     } else if (hour >= 18) {
       hour_str = '晚上';
       hour = hour - 12
-    } else {
+    }else {
       hour_str = '早上';
     }
     // console.log(minute)

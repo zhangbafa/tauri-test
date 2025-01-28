@@ -13,9 +13,10 @@
       <audio 
         ref="audioPlayer" 
         :src="audioSrc" 
-        :loop="enableLoop"
         controls 
         @ended="handleAudioEnd"
+        @play="handleAudioPlay"
+        @pause="handleAudioPause"
         style="width: 600px;height: 35px;"
       ></audio>
     </div>
@@ -28,10 +29,23 @@ import { ref, watch } from 'vue'
 import { open } from '@tauri-apps/plugin-dialog'
 import { readFile } from '@tauri-apps/plugin-fs'
 import { Message } from '@arco-design/web-vue'
+import { emit } from '@tauri-apps/api/event'
 
-const audioSrc = ref('')
+const audioSrc = ref('http://music.163.com/song/media/outer/url?id=1303019637.mp3')
 const audioPlayer = ref(null)
 const enableLoop = ref(true)
+
+const handleAudioPlay = () => {
+  // 发送事件降低视频音量
+  emit('custom-event', { action: 'volume', volume: 0.2 })
+  console.log('播放中')
+}
+
+const handleAudioPause = () => {
+  // 发送事件恢复视频音量
+  console.log('暂停中')
+  emit('custom-event', { action: 'volume', volume: 1.0 })
+}
 
 const selectMusicFile = async () => {
   try {
@@ -83,6 +97,7 @@ const handleAudioEnd = () => {
   // 如果不是循环模式，可以在这里添加额外的处理逻辑
   if (!enableLoop.value) {
     console.log('音频播放结束')
+    emit('custom-event', { action: 'volume', volume: 1.0 })
   }
 }
 
