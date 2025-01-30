@@ -50,6 +50,9 @@
             <smart class="canvas"/>
         </div> -->
       </a-form-item>
+      <a-card>
+        <a-button @click="handleShowMark"></a-button>
+      </a-card>
       
 </template>
 <script setup>
@@ -110,6 +113,10 @@ const handleChangededuplicated=(e)=>{
 }
 const handleChangeAlpha=(e)=>{
     emit('smartscene',{action:'setAlpha',alpha:e})
+}
+
+const handleShowMark=()=>{
+  emit('show-marks')
 }
 
 </script>
