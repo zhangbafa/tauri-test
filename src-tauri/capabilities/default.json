@@ -20,6 +20,7 @@
     "dialog:default",
     "dialog:allow-open",
     "fs:default",
+    "fs:scope-video",
     {
       "identifier": "shell:allow-execute",
       "allow": [
@@ -74,10 +75,15 @@
     "shell:allow-open",
     "shell:allow-kill",
     "shell:allow-stdin-write",
-    "core:webview:allow-create-webview" ,
+    "core:webview:allow-create-webview",
     "core:window:allow-create",
     "core:window:allow-close",
-    "core:webview:allow-create-webview-window"
-    
+    "core:webview:allow-create-webview-window",
+    "http:default",
+    {
+      "identifier": "http:default",
+      "allow": [{ "url": "https://*.volces.com" }],
+      "deny": [{ "url": "https://private.tauri.app" }]
+    }
   ]
 }

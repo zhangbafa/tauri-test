@@ -19,7 +19,10 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self' https://github.com; img-src 'self' https: data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://github.com; style-src 'self' 'unsafe-inline' https://github.com;"
+      "csp": "default-src 'self'; img-src 'self' https: data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://github.com; style-src 'self' 'unsafe-inline' https://github.com; media-src 'self' @fs:;",
+      "assetProtocol": {
+        "enable": true
+      }
     }
   },
   "bundle": {

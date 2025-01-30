@@ -15,7 +15,7 @@ export function useWindow() {
                 transparent: true,
                 decorations: true,
                 alwaysOnTop: false,
-                resizable: false,
+                resizable: true,
                 fullscreen: false,
                 dragDropEnabled: true,
                 backgroundColor: '#000000',

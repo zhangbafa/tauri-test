@@ -14,7 +14,7 @@ const constantRouterMap = [
       {
         path: "/index",
         name: "Index",
-        component: () => import("@/views/dashboard.vue"),
+        component: () => import("@/views/home.vue"),
         meta: {
           ignoreCache: false,
         },
@@ -58,7 +58,7 @@ const constantRouterMap = [
       {
         path: "/video",
         name: "Video",
-        component: () => import("@/views/video.vue"),
+        component: () => import("@/components/smartscene/smart.vue"),
         meta: {
           ignoreCache: false,
         },

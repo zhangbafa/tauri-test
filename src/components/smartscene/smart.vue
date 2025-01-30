@@ -1,9 +1,9 @@
 <template>
   <div class="container2">
-    {{ alpha }}-{{ draw }}
     <!-- /Users/zhang1/Downloads/tik.mp4 -->
     <!-- src='/@fs//Users/zhang1/Downloads/tik.mp4' -->
-    <video id="video" loop controls></video>
+    {{  }}
+    <video id="video" loop controls src=''></video>
     <canvas id="canvas"></canvas>
   </div>
 </template>
@@ -42,23 +42,25 @@ onMounted(() => {
   updateCanvasSize();
 
   video?.addEventListener("play", function () {
-    canvas.width = 1080/4;
-    canvas.height = 1920/4;
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
 
     function drawFrame() {
       if (!video.paused && !video.ended) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         // 绘制视频帧
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // 生成随机文字
-        // if(draw.value == 'A' || draw.value=='C'){
+        if(draw.value == 'A' || draw.value=='C'){
           const randomText = generateRandomText(10);
           ctx.font = "20px Arial";
           ctx.fillStyle = generateRandomColor();
           const x = Math.random() * canvas.width;
           const y = Math.random() * canvas.height;
           ctx.fillText(randomText, x, y);
-        // }
+        }
         
 
         // 继续绘制下一帧
@@ -81,16 +83,18 @@ onMounted(() => {
   });
 });
 
-unlisten = listen("setAnchorVolume", (event) => {
+unlisten = listen("smartscene", (event) => {
   switch (event.payload.action) {
     case "setpath":
       canvas.width = 1080/4
       canvas.height = 1920/4
-      console.log(event.payload.src)
+      // console.log(event.payload.src)
       video.src = event.payload.src
-      video.play()
-      console.log('play')
-      
+      video.addEventListener('loadeddata', () => {
+        video.play().catch(e => console.error("播放失败:", e))
+      }) // ✅ 确保加载完成
+
+    break;
     case "play":
       video.play();
       break;
@@ -107,7 +111,6 @@ unlisten = listen("setAnchorVolume", (event) => {
       break;
     case 'setAlpha':
       alpha.value = event.payload.alpha
-
       break
     case 'setDeDuplicate':
       draw.value = event.payload.type
@@ -117,6 +120,11 @@ unlisten = listen("setAnchorVolume", (event) => {
       alpha.value = event.payload.alpha
       document.querySelector('video').src = event.payload.src
       document.querySelector('video').play()
+      break;
+    case 'resetplay':
+    document.querySelector('video').currentTime=0
+    document.querySelector('video').play()
+    break;
   }
 });
 

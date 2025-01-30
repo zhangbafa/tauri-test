@@ -10,7 +10,7 @@
             <a-space>
               <!-- <a-button type="primary"  :style="{ marginLeft: '10px' }">确定</a-button> -->
               <a-button type="primary" :style="{ marginLeft: '10px' }" @click="handleEdit(item)">
-                保存
+                保存话术
               </a-button>
               <a-button @click="handleDelete(item.id)" :style="{ marginLeft: '10px' }"  status="danger">
                 <icon-delete/>
@@ -20,7 +20,8 @@
         </div>
         
         <div style="display: flex;justify-content: center;width: 90%;margin: 10px auto;">
-          <a-button @click="handleAdd" type="primary" long >添加话术</a-button>
+          <a-button @click="handleAdd" long style="margin-right: 10px">添加输入框</a-button>
+          <a-button @click="handleRefresh" type="primary" long>刷新话术</a-button>
         </div>
       </a-layout-content>
   
@@ -30,7 +31,7 @@
   import { ref, reactive } from 'vue'
   import { Message } from '@arco-design/web-vue'
   import dbManager from '@/db/index.js'
-  
+  import {emit} from '@tauri-apps/api/event'
   const form = reactive({
     name: '',
     posts: [{ value: '' },{ value: '' }]
@@ -83,7 +84,9 @@
       console.error('修改数据时出错: ', error)
     }
   }
-  
+const handleRefresh=()=>{
+  emit('refreshAssistant')
+}
   </script>
   
   

@@ -1,5 +1,8 @@
 import { useForWithDelay } from '@/compositions/useForWithDelay.js'
+import { emit } from '@tauri-apps/api/event';
+import {useRandomPicker} from './useRandomPicker.js'
 const { fetchSpeech } = useForWithDelay()
+const { getRandomElement,createCyclicPicker } = useRandomPicker()
 import wav01 from "@/assets/wav/01.wav";
 class AudioPlaylist {
     constructor(audioList) {
@@ -11,6 +14,7 @@ class AudioPlaylist {
         this.timer = null
         // 绑定方法到实例，避免多次创建函数引用
         this.handleAudioEnd = this.handleAudioEnd.bind(this);
+        this.cyclicPicker = createCyclicPicker(this.audioList)
     }
     revokeObjectURL(){
         if (this.currentAudioURL) {
@@ -25,12 +29,15 @@ class AudioPlaylist {
         }
         // this.stop(); // 停止当前播放
         this.audioList = audioList;
+        this.cyclicPicker = createCyclicPicker(audioList)
+        emit('addLog',{time:new Date().toLocaleString(),role:'用户',logtext:'主播话术更新成功'})
         // this.currentIndex = 0; // 重置播放索引
         // this.isPlaying = false;
     }
     handleAudioEnd() {
         // 先移除事件监听器
         this.audio.removeEventListener('ended', this.handleAudioEnd);
+        emit('setAnchorVolume',{action:'setvolume',volume:1})
         // 清理URL资源
         this.revokeObjectURL()
         this.isPlaying = false;
@@ -42,7 +49,7 @@ class AudioPlaylist {
                 this.currentIndex = 0;
             }
             this.play();
-        }, 2000);  // 2秒延迟
+        }, 4000);  // 2秒延迟
     }
     play(model_id=0) {
         if (this.isPlaying || this.currentIndex >= this.audioList.length) {
@@ -50,8 +57,10 @@ class AudioPlaylist {
         }
 
         this.isPlaying = true;
-        const currentItem = this.audioList[this.currentIndex];
-        
+        // 顺序播放
+        // const currentItem = this.audioList[this.currentIndex];
+        // 随机播放
+        const currentItem = this.cyclicPicker.next()
         // Check if current item is a text that needs speech synthesis
         const processAudioSource = async () => {
             let audioSource;
@@ -65,6 +74,8 @@ class AudioPlaylist {
                     // this.currentAudioURL = URL.createObjectURL(audioSource);
                     // this.audio.src = this.currentAudioURL;
                     this.audio.src=wav01
+                    emit('addLog',{time:new Date().toLocaleString(),role:'主播',logtext:text})
+
                 } catch (error) {
                     console.error('Failed to fetch speech:', error);
                     return;
@@ -82,6 +93,7 @@ class AudioPlaylist {
             // 确保每次播放前移除之前的事件监听器
             this.audio.removeEventListener('ended', this.handleAudioEnd);
             this.audio.addEventListener('ended', this.handleAudioEnd);
+            emit('setAnchorVolume',{action:'setvolume',volume:0.5})
             this.audio.play();
         };
 

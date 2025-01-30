@@ -8,7 +8,7 @@
 import { ref, defineModel } from 'vue'
 import { useForWithDelay } from '@/compositions/useForWithDelay.js'
 import { useAudioPlayer } from '@/compositions/useAudioPlayer.js'
-
+import {emit as emits } from '@tauri-apps/api/event'
 
 
 const inputText = ref('')
@@ -19,9 +19,14 @@ const selectedModels = defineModel()
 const handleBroadcast = async () => {
   const model_id = selectedModels.value?.assistant_model ?? 0
   const audioBlob = await fetchSpeech(inputText.value, model_id)
+  emits('addLog',{
+    time: new Date().toLocaleString(),
+    role:'手动插播',
+    logtext: inputText.value
+  })
   await playBlob(audioBlob)
   setTimeout(() => {
     inputText.value = ''
-  }, 5000)
+  }, 1000)
 }
 </script>

@@ -48,11 +48,12 @@
 
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref,onUnmounted } from 'vue'
 import { useForWithDelay } from '@/compositions/useForWithDelay.js'
 import { useAudioPlayer } from '@/compositions/useAudioPlayer.js'
 import dbManager from '@/db/index.js'
 import { open } from '@tauri-apps/plugin-shell'
+import { listen,emit } from '@tauri-apps/api/event'
 const props = defineProps({
     commentList: {
         type: Array,
@@ -72,6 +73,10 @@ fetchData()
 const handleRefresh = () => {
     fetchData()
 }
+const unlisten = listen('refreshAssistant',()=>{
+    fetchData()
+    Message.success('助播话术刷新成功')
+})
 // 回复评论
 const handleKeywordReplay = async (item) => {
     const model_id = selectedModels.value?.assistant_model ?? 0
@@ -96,6 +101,11 @@ const handlePlayHudong = async (item) => {
     }
     const model_id = selectedModels.value?.assistant_model ?? 0
     const audioBlob = await fetchSpeech(text, model_id)
+    emit('addLog',{
+        time: new Date().toLocaleString(),
+        role:'助播',
+        logtext:text
+    })
     await playBlob(audioBlob)
 }
 
@@ -103,6 +113,10 @@ const handlePlayHudong = async (item) => {
 const handleOpenUrl = (url) => {
     open(`https://www.douyin.com/user/${url}`)
 }
+
+onUnmounted(()=>{
+    unlisten()
+})
 </script>
 
 <style>

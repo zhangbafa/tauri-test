@@ -1,6 +1,5 @@
 <template>
   <div style="margin-left: 25px;margin-bottom: 20px;">
-    <h3 >背景音乐</h3>
     <a-space>
       <div>
       <a-button @click="selectMusicFile" type="primary">选择背景音乐</a-button>
@@ -30,20 +29,18 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { readFile } from '@tauri-apps/plugin-fs'
 import { Message } from '@arco-design/web-vue'
 import { emit } from '@tauri-apps/api/event'
-
-const audioSrc = ref('http://music.163.com/song/media/outer/url?id=1303019637.mp3')
+import {convertFileSrc} from '@tauri-apps/api/core'
+const audioSrc = ref('')
 const audioPlayer = ref(null)
 const enableLoop = ref(true)
 
 const handleAudioPlay = () => {
   // 发送事件降低视频音量
   emit('custom-event', { action: 'volume', volume: 0.2 })
-  console.log('播放中')
 }
 
 const handleAudioPause = () => {
   // 发送事件恢复视频音量
-  console.log('暂停中')
   emit('custom-event', { action: 'volume', volume: 1.0 })
 }
 
@@ -54,21 +51,22 @@ const selectMusicFile = async () => {
       directory: false,
       filters: [{
         name: '音频文件',
-        extensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a']
+        extensions: ['mp3', 'wav', 'ogg', 'flac', 'aac']
       }]
     })
 
     if (selected) {
       // 读取文件并创建 Blob URL
+      const mimeTypes = {
+          mp3: 'audio/mpeg',
+          wav: 'audio/wav',
+          ogg: 'audio/ogg',
+          aac: 'audio/aac',
+          flac: 'audio/flac',
+      };
       const fileData = await readFile(selected)
-      const blob = new Blob([fileData], { type: 'audio/mp3' })
+      const blob = new Blob([fileData], { type: mimeTypes })
       audioSrc.value = URL.createObjectURL(blob)
-
-      // 自动播放
-      if (audioPlayer.value) {
-        audioPlayer.value.play()
-      }
-
       // 提示
       Message.success('音频文件加载成功')
     }

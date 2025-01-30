@@ -22,28 +22,15 @@ export default defineConfig(async () => ({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
+  //
+  // 1. prevent vite from obscuring rust errors
   clearScreen: false,
+  // 2. tauri expects a fixed port, fail if that port is not available
   server: {
     port: 1420,
     strictPort: true,
     host: host || false,
-    
-    // 新增代理配置
-    proxy: {
-      // 示例：将所有以 /api 开头的请求代理到目标服务器
-      '/api': {
-        target: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions', // 替换为你的后端地址
-        changeOrigin: true, // 改变 origin 头
-        rewrite: (path) => path.replace(/^\/api/, ''), // 路径重写（可选）
-        // 更多配置选项...
-      },
-      // 可以添加多个代理规则
-      '/another-api': {
-        target: 'http://another-backend.com',
-        changeOrigin: true,
-        // ...
-      }
-    },
     hmr: host
       ? {
           protocol: "ws",
@@ -52,6 +39,7 @@ export default defineConfig(async () => ({
         }
       : undefined,
     watch: {
+      // 3. tell vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
     },
   },

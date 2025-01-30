@@ -1,17 +1,16 @@
 <template>
   <div>
-    <!-- {{ category_id }} - {{ category_name }} -->
-    <a-row>
-      <a-col :span="24">
-        <a-card title="">
+    <a-tabs default-active-key="1" type="card-gutter">
+      <a-tab-pane key="1">
+        <template #title> <icon-home /> 主控台 </template>
+        <div style="padding: 10px">
           <div style="display: flex; justify-content: space-between">
             <a-space>
-                <div class="baoshi-box">
+              <div class="baoshi-box">
                 <a-space>
-                    <a-switch v-model="enableAnchor" @change="handleKaiqi" /> 主播AI{{
-                enableAnchor ? "开启" : "关闭"
-              }}
-              <!-- <a-switch v-model="enableAnchor" @change="handleKaiqi" /> 助播AI{{
+                  <a-switch v-model="enableAnchor" @change="handleKaiqi" />
+                  主播AI{{ enableAnchor ? "开启" : "关闭" }}
+                  <!-- <a-switch v-model="enableAnchor" @change="handleKaiqi" /> 助播AI{{
                 enableAnchor ? "开启" : "关闭"
               }} -->
                 </a-space>
@@ -28,58 +27,54 @@
                   <a-switch @change="handleConnentDanMu" /> 连接弹幕服务
                   <icon-right />
                   直播间人数
-                  <a-link>{{ currentCount }}</a-link
-                  >
+                  <a-link>{{ currentCount }}</a-link>
                 </a-space>
               </div>
             </a-space>
             <a-space>
               <!-- <selectanchor v-model="selectedModels" />
               <icon-right /> -->
-              <managementmodel/>
+              <managementmodel />
               <speechservice />
             </a-space>
           </div>
-          <a-divider />
-          <a-space>
-            <a-button type="outline" @click="handleSetAnchor" status="primary"
-              >配置主播话术</a-button
-            >
-            
-            <a-button type="outline" @click="handleSetAssistant" status="primary"
-              >配置助播话术</a-button
-            >
-            <a-button type="outline" @click="handleSetInterrupt" status="primary"
-              >配置衔接话术</a-button
-            >
-            <a-button type="outline" status="primary"
-              >系统设置</a-button
-            >
-            <a-button type="outline" status="primary"
-            @click="handlerCreateNewWindow"
-              >打开智景</a-button
-            >
-          </a-space>
-        </a-card>
-      </a-col>
-      <a-col :span="24">
-        <ManualBroadcast v-model="selectedModels" />
-        <comment v-model="selectedModels" :commentList="hudongList" />
-      </a-col>
-      <a-col :span="24">
-        <Log/>
-      </a-col>
-    </a-row>
-   
+          <a-row>
+            <a-col :span="24">
+              <ManualBroadcast v-model="selectedModels" />
+              <comment v-model="selectedModels" :commentList="hudongList" />
+            </a-col>
+            <a-col :span="24">
+              <Log />
+            </a-col>
+          </a-row>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane key="2" title="主播设置">
+        <Anchor />
+      </a-tab-pane>
+      <a-tab-pane key="3" title="助播设置">
+        <Assistant />
+      </a-tab-pane>
+      <a-tab-pane key="4" title="衔接话术">
+        <interrupt />
+      </a-tab-pane>
+      <a-tab-pane key="5" title="系统设置">
+        <a-divider orientation="left">背景音乐</a-divider>
+        <bgm />
+        <a-divider orientation="left">铃声设置</a-divider>
+        <bellsetting @update-bell-time-range="handleTimeRangeUpdate" />
+        <a-divider orientation="left">报时设置</a-divider>
+        <timespeakersetting
+          @update-timespeaker-range="handleTimeSpeakerRangeUpdate"
+        />
+      </a-tab-pane>
+      <a-tab-pane key="6" title="智景">
+        <div style="padding: 10px">
+          <smartscene />
+        </div>
+      </a-tab-pane>
+    </a-tabs>
   </div>
-  <a-drawer width="100%" cancel-text="返回主控台" ok-text="刷新话术"  :visible="visible" @ok="handleOk" @cancel="handleCancel" :on-before-ok="handleOnBeforeOK" unmountOnClose>
-    <template #title>
-      主播话术
-    </template>
-    <div>
-      <component :is="currentComponent" v-if="visible"></component>
-    </div>
-  </a-drawer>
 </template>
 
 <script setup>
@@ -98,88 +93,71 @@ import { useInterval } from "@/compositions/useInterval.js";
 import { useAudioPlayer } from "@/compositions/useAudioPlayer.js";
 import { replayText, shortText } from "@/data/shortText.js";
 // 异步加载组件
-const speechservice = defineAsyncComponent(() => import('@/components/speechservice/index.vue'));
-const managementmodel = defineAsyncComponent(() => import('@/components/speechservice/managementmodel.vue'));
-const selectanchor = defineAsyncComponent(() => import('@/components/speechservice/selectanchor.vue'));
-const ManualBroadcast = defineAsyncComponent(() => import('@/components/broadcast/ManualBroadcast.vue'));
-const comment = defineAsyncComponent(() => import('@/components/livecomment/comment.vue'));
-const Anchor = defineAsyncComponent(() => import('@/components/script/anchor.vue'));
-const Assistant = defineAsyncComponent(() => import('@/components/script/assistant.vue'));
-const interrupt = defineAsyncComponent(() => import('@/components/script/interrupt.vue'));
-const bellsetting = defineAsyncComponent(() => import('@/components/setting/bellsetting.vue'));
-const timespeakersetting = defineAsyncComponent(() => import('@/components/setting/timespeakersetting.vue'));
-const bgm = defineAsyncComponent(() => import('@/components/setting/bgm.vue'));
-const Log = defineAsyncComponent(() => import('@/components/logs/log.vue'));
-
+const speechservice = defineAsyncComponent(() =>
+  import("@/components/speechservice/index.vue")
+);
+const managementmodel = defineAsyncComponent(() =>
+  import("@/components/speechservice/managementmodel.vue")
+);
+const selectanchor = defineAsyncComponent(() =>
+  import("@/components/speechservice/selectanchor.vue")
+);
+const ManualBroadcast = defineAsyncComponent(() =>
+  import("@/components/broadcast/ManualBroadcast.vue")
+);
+const comment = defineAsyncComponent(() =>
+  import("@/components/livecomment/comment.vue")
+);
+const Anchor = defineAsyncComponent(() =>
+  import("@/components/script/anchor.vue")
+);
+const Assistant = defineAsyncComponent(() =>
+  import("@/components/script/assistant.vue")
+);
+const interrupt = defineAsyncComponent(() =>
+  import("@/components/script/interrupt.vue")
+);
+const bellsetting = defineAsyncComponent(() =>
+  import("@/components/setting/bellsetting.vue")
+);
+const timespeakersetting = defineAsyncComponent(() =>
+  import("@/components/setting/timespeakersetting.vue")
+);
+const bgm = defineAsyncComponent(() => import("@/components/setting/bgm.vue"));
+const Log = defineAsyncComponent(() => import("@/components/logs/log.vue"));
+const setting = defineAsyncComponent(() =>
+  import("@/components/setting/bgm.vue")
+);
+const smartscene = defineAsyncComponent(() =>
+  import("@/components/smartscene/index.vue")
+);
 import { useRandomPicker } from "@/compositions/useRandomPicker";
 import AudioPlaylist from "@/compositions/playlist";
 import dbManager from "@/db/index.js";
 import LoopAudio from "@/compositions/loopAudio";
 import wav01 from "@/assets/wav/01.wav";
-import { useWindow } from '@/compositions/useWindow';
 
-const { createNewWindow, sendWindowMessage, closeWindow } = useWindow();
+import { useRoute } from "vue-router";
+import { listen,emit } from "@tauri-apps/api/event";
 
-import { useRoute } from 'vue-router'
-const visible = ref(false)
-const currentComponent = ref(null)
-
-const handleSetAnchor = () => {
-  currentComponent.value = markRaw(Anchor)
-  visible.value = true
-}
-
-const handleSetAssistant = () => {
-  currentComponent.value = markRaw(Assistant)
-  visible.value = true
-}
-
-const handleSetInterrupt = () => {
-  currentComponent.value = markRaw(interrupt)
-  visible.value = true
-}
-const handleOk = () => {
-  visible.value = false;
-};
-const handleCancel = () => {
-  visible.value = false;
-}
-
-const params = useRoute()
-const {category_id,category_name} = params.query
-document.title = category_name
+const params = useRoute();
+const { category_id = 1, category_name = "未命名直播间" } = params.query;
+document.title = category_name;
 const timeRange = ref([70, 90]);
 const selectedModels = ref({});
-const {
-  connectWebSocket,
-  disconnectWebSocket,
-  msgList,
-  giftList,
-  hudongList,
-  currentCount,
-} = useSocket();
-const { fetchSpeech, setTimeParseTime, processUsername } = useForWithDelay();
+const { connectWebSocket, disconnectWebSocket, hudongList, currentCount } =
+  useSocket();
+const { fetchSpeech, setTimeParseTime } = useForWithDelay();
 const { startPeriodicExecution, stopPeriodicExecution } =
   useInterval(timeRange);
-const { playBlob, close, playing, setVolume, setPlaybackRate } =
-  useAudioPlayer();
+const { playBlob, setVolume, setPlaybackRate } = useAudioPlayer();
 const text = ref("");
 const loading = ref(false);
 
-const { getRandomElement, shuffleArray, createCyclicPicker } =
-  useRandomPicker();
+const { getRandomElement } = useRandomPicker();
 
 const isTotalUserCount = ref(0);
-import { listen } from "@tauri-apps/api/event";
-import { create } from "@tauri-apps/plugin-fs";
 
-listen("custom-event", (event) => {
-  //volume
-  console.log(event.payload);
-  if (event.payload.action === "volume") {
-    document.querySelector("video").volume = event.payload.volume;
-  }
-});
 /**
  * 自动报时 和 铃铛
  */
@@ -191,8 +169,8 @@ const handleAutoStart = async (e) => {
   if (e) {
     startPeriodicExecution("", currentCount.value, async (item) => {
       const temp = getRandomElement(shortText);
-      console.log(typeof isTotalUserCount.value, isTotalUserCount.value);
-      console.log(typeof currentCount.value, currentCount.value);
+      // console.log(typeof isTotalUserCount.value, isTotalUserCount.value);
+      // console.log(typeof currentCount.value, currentCount.value);
       // todo 添加报直播间人数
       let totalUserCount = "";
       if (
@@ -202,11 +180,16 @@ const handleAutoStart = async (e) => {
         totalUserCount = `直播间有${currentCount.value}位家人,`;
       }
       const text = `${setTimeParseTime()},${totalUserCount}${temp.text}`;
-      const audioBlob = await fetchSpeech(text, selectedModels.value.report_model??0);
+      emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'报时：'+text})
+      const audioBlob = await fetchSpeech(
+        text,
+        selectedModels.value.report_model ?? 0
+      );
       await playBlob(audioBlob);
     });
   } else {
     stopPeriodicExecution();
+    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'关闭定时报时'})
     loading.value = false;
   }
 };
@@ -217,9 +200,11 @@ const handleBell = (e) => {
   if (e) {
     // console.log('开启铃铛')
     bellAudio.start();
+    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'播放铃铛声音'})
   } else {
     // console.log('关闭铃铛')
     bellAudio.stop();
+    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'关闭铃铛'})
   }
 };
 // 更新铃铛时间范围
@@ -242,14 +227,13 @@ const handleTimeSpeakerRangeUpdate = (
 
 // 链接WS
 const handleConnentDanMu = (e) => {
-  if(e){
+  if (e) {
     connectWebSocket();
-  }else{
+    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'成功连接弹幕服务'})
+  } else {
     disconnectWebSocket(false);
   }
-  
 };
-
 
 onUnmounted(() => {
   bellAudio.destroy();
@@ -265,25 +249,15 @@ const isAudioLoading = ref(false); // 加载状态
 const audioError = ref(null); // 错误追踪
 const enableAnchor = ref(false);
 const initializeAudioPlaylist = async () => {
+  console.log('start')
   try {
     // 开始加载
     isAudioLoading.value = true;
 
     // 从数据库获取脚本
-    const a = await dbManager.query(
-      "select * from anchor_script where category_id = 1"
-    );
-
-    // 智能提取文本内容
-    const textContent = a
-      .map((item) =>
-        typeof item === "object" ? item.text || item.content || "" : item
-      )
-      .filter((text) => text.trim() !== "");
-    console.log(textContent)
+    const list = await fetchAnchorList()
     // 创建播放列表
-    audioList.value = new AudioPlaylist(textContent);
-
+    audioList.value = new AudioPlaylist(list);
     // 加载完成
     isAudioLoading.value = false;
   } catch (error) {
@@ -293,45 +267,49 @@ const initializeAudioPlaylist = async () => {
     isAudioLoading.value = false;
   }
 };
-const handleRefresh = () => {
-  initializeAudioPlaylist();
-  Message.success("刷新成功");
-};
+
 const handleKaiqi = () => {
   // 安全播放
   if (enableAnchor.value) {
     if (audioList.value) {
-      audioList.value.play(selectedModels.value.anchor_model??0);
+      audioList.value.play(selectedModels.value.anchor_model ?? 0);
     } else {
       console.warn("音频播放列表未初始化");
     }
   } else {
-    console.log('主播停止')
+    console.log("主播停止");
     audioList.value.stop();
   }
 };
-const handleOnBeforeOK= async ()=>{
-  const result = await dbManager.query("select * from anchor_script where category_id = ?",[category_id]);
+const fetchAnchorList= async ()=>{
+  const result = await dbManager.query(
+    "select * from anchor_script where category_id = ?",
+    [category_id]
+  );
 
-    // 智能提取文本内容
-    const textContent = result
-      .map((item) =>
-        typeof item === "object" ? item.text || item.content || "" : item
-      )
-      .filter((text) => text.trim() !== "");
-      // console.log(textContent)
-  audioList.value.updateList(textContent)
-  return true
+  // 智能提取文本内容
+  const list = result
+    .map((item) =>
+      typeof item === "object" ? item.text || item.content || "" : item
+    )
+    .filter((text) => text.trim() !== "");
+  return list
 }
-// 打开智景
-const handlerCreateNewWindow=()=>{
-  createNewWindow('#/video','畅语智景')
-}
+// 刷新主播话术
+const unlisten = listen("refreshAnchorList", async () => {
+  const list = await fetchAnchorList()
+  audioList.value.updateList(list);
+  Message.success('主播刷术刷新成功')
+});
+
+
+
 // 组件挂载时自动初始化
 onMounted(initializeAudioPlaylist);
 onUnmounted(() => {
   audioList.value.destroy();
-})
+  unlisten();
+});
 </script>
 
 <style>

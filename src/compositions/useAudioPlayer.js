@@ -7,7 +7,7 @@ export function useAudioPlayer() {
   const audioContext = new (window.AudioContext || window.webkitAudioContext)()  
   const playBlob = async (blob) => {
     try {
-      console.log(`音量，语速：${volume.value,playbackRate.value}`)
+      // console.log(`音量，语速：${volume.value,playbackRate.value}`)
       // 将 Blob 转换为音频缓冲区
       const arrayBuffer = await blob.arrayBuffer()
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
@@ -48,7 +48,9 @@ export function useAudioPlayer() {
       // 播放
       playing.value = true
       
+
       source.start(0)
+      // setAnchorVolume
       
       return source
     } catch (error) {

@@ -1,20 +1,23 @@
 <template>
-  <h3 style="margin-left: 25px;">报时设置</h3>
+  <!-- <h3 style="margin-left: 25px;">报时设置</h3> -->
   <a-alert type="success" v-show="show" closable>设置成功,下次播放生效.</a-alert>
-  <a-form :model="form" :style="{ margin: '20px' }" :rules="rules" @submit="handleSubmit" layout="inline">
+  <a-form :model="form" :style="{ margin: '20px',width:'500px' }" :rules="rules" @submit="handleSubmit" >
     <a-form-item field="min" label="最小值" label-col-flex="100px">
       <a-input v-model="form.min" placeholder="请输入最小值" />
       <template #help>
-        <div>单位是秒</div>
+        <div>单位:秒</div>
       </template>
     </a-form-item>
     <a-form-item field="max" label="最大值" label-col-flex="100px">
       <a-input v-model="form.max" placeholder="请输入max" />
+      <template #help>
+      <div>单位:秒</div>
+      </template>
     </a-form-item>
     <a-form-item field="volume" label="音量" label-col-flex="100px">
       <a-input v-model="form.volume" placeholder="请输入音量" :rules="{ pattern: /^[0-9]+(\.[0-9]+)?$/, message: '请输入数字' }" />
       <template #help>
-        <div>0-1之间</div>
+        <div>0-1之间, 0是静音</div>
       </template>
     </a-form-item>
     <a-form-item field="playbackRate" label="播放速度" label-col-flex="100px">
@@ -23,13 +26,13 @@
         <div>0.25-2之间</div>
       </template>
     </a-form-item>
-    <a-form-item field="totalUserCount" label="人数" label-col-flex="50px">
+    <a-form-item field="totalUserCount" label="开始播报人数" label-col-flex="100px">
       <a-input v-model="form.totalUserCount" placeholder="请输入播放速度" />
       <template #help>
         <div>大于等于输入的数字开始报人数，0不报人数</div>
       </template>
     </a-form-item>
-    <a-form-item>
+    <a-form-item label-col-flex="100px">
       <a-button html-type="submit" type="primary">确定</a-button>
     </a-form-item>
   </a-form>
@@ -49,6 +52,7 @@ const form = reactive({
 });
 
 const handleSubmit = ({ values, errors }) => {
+  if(errors) return false
   emit('update-timespeaker-range', [Number(form.min), Number(form.max)], form.volume, form.playbackRate,form.totalUserCount);
   Notification.success({
     title: '设置成功',

@@ -1,6 +1,6 @@
 <template>
-    <h3 style="margin-left: 25px;">铃声设置</h3>
-    <a-form :model="form" :style="{ margin: '20px' }" :rules="rules" @submit="handleSubmit" layout="inline">
+    <!-- <h3 style="margin-left: 25px;">铃声设置</h3> -->
+    <a-form :model="form" :style="{ margin: '20px',width:'500px' }" :rules="rules" @submit="handleSubmit">
       <a-form-item field="min" label="最小值" label-col-flex="100px">
         <a-input
           v-model="form.min"
@@ -16,7 +16,7 @@
       <a-form-item field="volume" label="音量" label-col-flex="100px">
         <a-input v-model="form.volume" placeholder="请输入音量" :rules="{pattern:/^[0-9]+(\.[0-9]+)?$/,message:'请输入数字'}" />
         <template #help>
-        <div>0-1之间</div>
+        <div>0-1之间, 0是静音</div>
         </template> 
       </a-form-item>
       <a-form-item field="playbackRate" label="播放速度" label-col-flex="100px">
@@ -25,7 +25,7 @@
         <div>0.25-2之间</div>
         </template>
       </a-form-item>
-      <a-form-item>
+      <a-form-item label-col-flex="100px">
         <a-button html-type="submit" type="primary">确定</a-button>
       </a-form-item>
     </a-form>
@@ -34,7 +34,7 @@
   <script setup>
   import { reactive } from 'vue';
   import { Notification } from '@arco-design/web-vue';
-  const emit = defineEmits(['update-time-range']);
+  const emit = defineEmits(['update-bell-time-range']);
   
   const form = reactive({
     min: '40',
@@ -44,7 +44,8 @@
   });
   
   const handleSubmit = ({values, errors}) => {
-    emit('update-time-range', [Number(form.min), Number(form.max)],form.volume,form.playbackRate);
+    if(errors) return false
+    emit('update-bell-time-range', [Number(form.min), Number(form.max)],form.volume,form.playbackRate);
     Notification.success({
       title: '设置成功',
       content: '下次播放生效!',
