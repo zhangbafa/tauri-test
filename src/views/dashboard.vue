@@ -8,26 +8,23 @@
             <a-space>
               <div class="baoshi-box">
                 <a-space>
-                  <a-switch v-model="enableAnchor" @change="handleKaiqi" />
+                  <a-switch v-model="enableAnchor" @change="handleKaiqi" checked-color="#F53F3F"/>
                   主播AI{{ enableAnchor ? "开启" : "关闭" }}
-                  <!-- <a-switch v-model="enableAnchor" @change="handleKaiqi" /> 助播AI{{
-                enableAnchor ? "开启" : "关闭"
-              }} -->
                 </a-space>
               </div>
               <div class="baoshi-box">
                 <a-space>
-                  <a-switch @change="handleAutoStart" /> 自动报时
+                  <a-switch @change="handleAutoStart"  /> 自动报时
                   <icon-right />
-                  <a-switch @change="handleBell" /> 开启铃铛
+                  <a-switch @change="handleBell"  /> 开启铃铛
                 </a-space>
               </div>
               <div class="ws-box">
                 <a-space>
-                  <a-switch @change="handleConnentDanMu" /> 连接弹幕服务
+                  <a-switch @change="handleConnentDanMu" checked-color="#00B42A"/> 连接弹幕服务
                   <icon-right />
                   直播间人数
-                  <a-link>{{ currentCount }}</a-link>
+                  <a-link :hoverable="false">{{ currentCount }}</a-link>
                 </a-space>
               </div>
             </a-space>
@@ -325,5 +322,6 @@ onUnmounted(() => {
   border: 1px solid var(--color-fill-3);
   padding: 10px;
   border-radius: 5px;
+
 }
 </style>

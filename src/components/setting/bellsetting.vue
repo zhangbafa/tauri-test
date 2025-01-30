@@ -7,11 +7,14 @@
           placeholder="请输入最小值"
         />
         <template #help>
-        <div>单位是秒</div>
+        <div>单位:秒</div>
         </template>
       </a-form-item>
       <a-form-item field="max" label="最大值" label-col-flex="100px">
         <a-input v-model="form.max" placeholder="请输入max" />
+        <template #help>
+        <div>单位:秒</div>
+        </template>
       </a-form-item>
       <a-form-item field="volume" label="音量" label-col-flex="100px">
         <a-input v-model="form.volume" placeholder="请输入音量" :rules="{pattern:/^[0-9]+(\.[0-9]+)?$/,message:'请输入数字'}" />

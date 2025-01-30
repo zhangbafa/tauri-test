@@ -1,10 +1,11 @@
 <template>
-    <a-layout>
-      <a-layout-content>
+  <a-row :gutter="5">
+    <a-col :span="18">
+      <a-card style="margin: 10px">
         <div class="container" v-for="(item, index) of assistant_reply" :key="item.id">
           <div style="width: 80px;">话术{{ index + 1 }}</div>
           <div style="margin: 0 auto;width: 85%;">
-            <a-textarea v-model="item.reply_content" placeholder="请输入助播话术" :max-length="100" auto-size allow-clear show-word-limit/>
+            <a-textarea v-model="item.reply_content" placeholder="请输入助播话术" :max-length="150" auto-size allow-clear show-word-limit/>
           </div>
           <div>
             <a-space>
@@ -18,14 +19,42 @@
             </a-space>
           </div>
         </div>
-        
-        <div style="display: flex;justify-content: center;width: 90%;margin: 10px auto;">
-          <a-button @click="handleAdd" long style="margin-right: 10px">添加输入框</a-button>
-          <a-button @click="handleRefresh" type="primary" long>刷新话术</a-button>
+        <a-divider/>
+        <div style="display: flex;justify-content: flex-end;margin: 10px;">
+          <a-button @click="handleRefresh" >刷新话术</a-button>
+          <a-button @click="handleAdd" type="primary" style="margin-left: 13px">添加输入框</a-button>
         </div>
-      </a-layout-content>
-  
-    </a-layout>
+      </a-card>
+    </a-col>
+    <a-col :span="6">
+      <a-card title="调整音量/语速" style="margin:10px">
+          <div style="margin: 15px 0 20px 0">
+            <div style="display: inline-block;margin-right: 10px;">音量</div>
+            <a-slider :min="0" :max="100" :setp="1" :style="{ width: '83%' }"   /> 
+          </div>
+          <div>
+            <div style="display: inline-block;margin-right: 10px;">语速</div>
+            <a-slider :min="0.25" :step="0.25" :max="2" :style="{ width: '83%'}" show-ticks />
+          </div>
+          <div style="margin-top: 15px;text-align: right;">
+            <a-button type="primary" size="small">确定</a-button>
+          </div>
+        </a-card>
+        <a-card title="选择主播" style="margin: 15px 10px 10px 10px">
+          <div style="margin: 15px 0 20px 0">
+            <a-select placeholder="Please select ...">
+              <a-option>主播1</a-option>
+              <a-option>主播2</a-option>
+              <a-option>主播3</a-option>
+              <a-option disabled>Disabled</a-option>
+            </a-select>
+          </div>
+          <div style="margin-top: 15px;text-align: right;">
+            <a-button type="primary" size="small">确定</a-button>
+          </div>
+        </a-card>
+    </a-col>
+  </a-row>
   </template>
   <script setup>
   import { ref, reactive } from 'vue'

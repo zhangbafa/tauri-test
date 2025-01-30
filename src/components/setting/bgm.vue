@@ -8,6 +8,7 @@
       <a-switch v-model="enableLoop" @change="handleLoopChange"/>
       <span style="margin: 0 10px;">循环{{ enableLoop ? '开启' : '关闭' }}</span>
     </div>
+    </a-space>
     <div v-if="audioSrc" style="margin-top: 10px;">
       <audio 
         ref="audioPlayer" 
@@ -19,7 +20,6 @@
         style="width: 600px;height: 35px;"
       ></audio>
     </div>
-    </a-space>
   </div>
 </template>
 
@@ -64,8 +64,9 @@ const selectMusicFile = async () => {
           aac: 'audio/aac',
           flac: 'audio/flac',
       };
+      const mime=mimeTypes[getFileExtension(selected)]
       const fileData = await readFile(selected)
-      const blob = new Blob([fileData], { type: mimeTypes })
+      const blob = new Blob([fileData], { type: mime })
       audioSrc.value = URL.createObjectURL(blob)
       // 提示
       Message.success('音频文件加载成功')
@@ -75,7 +76,10 @@ const selectMusicFile = async () => {
     Message.error('加载音频文件失败：' + error.message)
   }
 }
-
+function getFileExtension(filename) {
+  const match = filename.match(/\.([a-zA-Z0-9]+)$/);
+  return match ? match[1] : '';
+}
 const handleLoopChange = (checked) => {
   enableLoop.value = checked
   
