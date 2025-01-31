@@ -1,22 +1,70 @@
 <template>
   <div class="container">
     <div class="app-name">
-      <h1 style="text-align: left;">选择你的直播间</h1>
+      <!-- <h1 style="text-align: left;">选择你的直播间</h1> -->
     </div>
   <div>
         <a-row :gutter="20">
           <a-col :span="12" v-for="item in category" :key="item.id" style="margin-bottom: 15px;cursor: pointer;">
             <a-card hoverable @click="handleNav(item)">
-              <div style="display: left;justify-content: space-between;">
-                <span>{{ item.category_name }}</span>
-                <icon-right />
+              <a-dropdown trigger="contextMenu" alignPoint :style="{display:'block'}">
+              <div  style="display: flex;justify-content: space-between;width: 100%;padding: 10px;align-items: center;">
+                <div @focus="handleFocus" style="font-weight: bold;width: 80%;padding: 6px;">{{ item.category_name }}</div>
+                <div>
+                  <icon-right />
+                </div>
               </div>
+              <template #content>
+                <a-doption @click.stop="handleEditModel(item)">
+                  <template #icon>
+                    <icon-edit />
+                  </template>
+                  <template #default>编辑</template>
+                </a-doption>
+                <a-doption @click.stop="handleCreate(item)">
+                  <template #icon>
+                    <icon-plus />
+                  </template>
+                  <template #default>添加</template>
+                </a-doption>
+                <a-doption @click.stop="handleDelete(item,'delete')">
+                    <template #icon>
+                    <icon-delete />
+                  </template>
+                  <template #default>删除</template>
+                  
+                </a-doption>
+              </template>
+            </a-dropdown>
+             
+              
             </a-card>
           </a-col>
         </a-row>
       </div>
   </div>
-
+  <a-drawer :width="340" :header="false" :visible="visible" placement="bottom" unmountOnClose @ok="handleOk"
+  @cancel="handleCancel" :footer="true">
+    <template #title>
+      Title
+    </template>
+    <div style="padding-top: 40px" v-if="!isDelete">
+      <a-form :style="{ width: '600px',margin:'0 auto' }">
+        <a-form-item field="name" label="直播间名称">
+          <a-input
+            v-model="category_name"
+            placeholder=""
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="handleSave">保存</a-button>
+        </a-form-item>
+      </a-form>
+    </div>
+    <div v-else>
+      <h1>是否确认删除？</h1>
+    </div>
+  </a-drawer>
 </template>
 
 <script setup>
@@ -24,21 +72,75 @@ import { ref,onMounted } from 'vue'
 import dbManager from '@/db/index.js'
 import logo from '@/assets/128x128@2x.png'
 import { useRouter } from 'vue-router'
+import {Message} from '@arco-design/web-vue'
 const router = useRouter()
 // 
+const show = ref(false)
 const category = ref([])
+const category_name = ref('')
 // 
+const handleFocus=()=>{
+  show.value = true
+}
 onMounted(async ()=>{
   initializeData()
-  const devices =  navigator.mediaDevices.enumerateDevices().then(()=>{
-    const inputDevices = devices.filter(device => device.kind === 'audioinput');
-        const outputDevices = devices.filter(device => device.kind === 'audiooutput');
-        console.log(inputDevices,outputDevices)
-  });
-        
        
 })
 
+const selectid = ref(0)
+const visible = ref(false)
+const handleEditModel=(item)=>{
+  visible.value = true
+  selectid.value = item.id
+  category_name.value = item.category_name
+}
+const handleCreate=()=>{
+  visible.value = true
+  selectid.value = ''
+  category_name.value = ''
+}
+const handleSave= async ()=>{
+  if(selectid.value){
+    const result = await dbManager.update('category',{
+        category_name:category_name.value
+      },{
+        id:selectid.value
+      })
+      //{lastInsertId: 0, rowsAffected: 1}
+      if(result.rowsAffected){
+        category.value = await dbManager.query('select * from category')
+        visible.value = false
+      }
+  }else{
+      await dbManager.insert('category', {
+      'category_name': category_name.value
+      })  
+      category.value = await dbManager.query('select * from category')
+      visible.value = false
+  }
+  
+
+}
+const isDelete = ref(false)
+const handleDelete=(item,type)=>{
+  selectid.value = item.id
+  if(item.id==1){
+    Message.error('不能删除')
+    return false
+  }
+  isDelete.value = true
+  visible.value = true
+}
+const handleOk = async () => {
+  const result = await dbManager.delete('category',{id:selectid.value})
+  category.value = await dbManager.query('select * from category')
+  visible.value = false;
+};
+const handleCancel = () => {
+  visible.value = false;
+  selectid.value = ''
+  isDelete.value = false
+}
 const handleNav = (item)=>{
   router.push({
     path: '/dashboard',
@@ -90,9 +192,14 @@ const initializeData = async () => {
     'update_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
   });
 
-  // await dbManager.insert('category', {
-  //   'category_name': '莲花味精'
-  // })  
+  
+
+  const result = await dbManager.query('select count(*) as count from category')
+  if(result[0].count==0){
+      await dbManager.insert('category', {
+      'category_name': '默认直播间'
+      })  
+  }
   category.value = await dbManager.query('select * from category')
 }
 </script>

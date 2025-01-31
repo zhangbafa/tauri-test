@@ -12,7 +12,9 @@
         color-scheme: dark; 
       }
       #loadingPage {
-        background-color: #dedede34;
+        /* background-color: #dedede34; */
+        width: 100%;
+        height: 100%;
         font-size: 12px;
       }
       .base {
@@ -107,14 +109,13 @@
     <script type="module" src="/src/main.js"></script>
     <script>
       const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
-
-darkThemeMq.addEventListener('change', e => {
-  if (e.matches) {
-    document.body.setAttribute('arco-theme', 'dark');
-  } else {
-    document.body.removeAttribute('arco-theme');
-  }
-});
+      darkThemeMq.addEventListener('change', e => {
+        if (e.matches) {
+          document.body.setAttribute('arco-theme', 'dark');
+        } else {
+          document.body.removeAttribute('arco-theme');
+        }
+      });
     </script>
   </body>
 </html>

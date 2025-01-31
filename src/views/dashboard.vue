@@ -3,7 +3,11 @@
     <a-tabs default-active-key="1" type="card-gutter">
       <a-tab-pane key="1">
         <template #title> <icon-home /> 主控台 </template>
+        <a-space>
+          <a-link :hoverable="false" style="margin-left: 10px;font-size: 10px;" href="/"><icon-left /> {{ category_name }}</a-link>
+        </a-space>
         <div style="padding: 10px">
+         
           <div style="display: flex; justify-content: space-between">
             <a-space>
               <div class="baoshi-box">
