@@ -28,8 +28,15 @@ const router = useRouter()
 // 
 const category = ref([])
 // 
-onMounted(()=>{
+onMounted(async ()=>{
   initializeData()
+  const devices =  navigator.mediaDevices.enumerateDevices().then(()=>{
+    const inputDevices = devices.filter(device => device.kind === 'audioinput');
+        const outputDevices = devices.filter(device => device.kind === 'audiooutput');
+        console.log(inputDevices,outputDevices)
+  });
+        
+       
 })
 
 const handleNav = (item)=>{

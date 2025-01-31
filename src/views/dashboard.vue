@@ -193,7 +193,7 @@ const handleAutoStart = async (e) => {
 
 // 铃铛
 const bellAudio = new LoopAudio(wav01, [40, 50]);
-const handleBell = (e) => {
+const handleBell = async (e) => {
   if (e) {
     // console.log('开启铃铛')
     bellAudio.start();
