@@ -170,8 +170,6 @@ const handleAutoStart = async (e) => {
   if (e) {
     startPeriodicExecution("", currentCount.value, async (item) => {
       const temp = getRandomElement(shortText);
-      // console.log(typeof isTotalUserCount.value, isTotalUserCount.value);
-      // console.log(typeof currentCount.value, currentCount.value);
       // todo 添加报直播间人数
       let totalUserCount = "";
       if (

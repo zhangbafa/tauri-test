@@ -81,6 +81,29 @@
           <a-button type="primary" size="small">确定</a-button>
         </div>
       </a-card>
+      <a-card title="变量规则" style="margin: 15px 10px 10px 10px">
+        <div style="margin: 15px 0 20px 0">
+          <a-typography>
+            <a-typography-title :heading="6">普通变量</a-typography-title>
+            <a-typography-paragraph>
+              变量使用<a-tag style="margin: 0 6px" color="arcoblue">{ }</a-tag>包括起来，每个变量用<a-tag style="margin: 0 6px" color="arcoblue"> | </a-tag>分隔开，主播在播报时会随机选择一个。例:{变量1|变量2}
+              <icon-copy />
+            </a-typography-paragraph>
+            <a-typography-paragraph>
+              须在英文输入状态输入符号
+            </a-typography-paragraph>
+            <a-typography-title :heading="6">特殊变量</a-typography-title>
+            <a-typography-paragraph>
+              <a-tag style="margin: 0 4px" color="arcoblue"> {time} </a-tag>
+              替换为 <a-tag>现在是下午3点10分</a-tag>
+            </a-typography-paragraph>
+          </a-typography>
+          <a-space>
+            <a-button size="mini" @click="handleCopy('{变量1|变量2}')"><icon-copy />复制普通变量</a-button>
+            <a-button size="mini" @click="handleCopy('{time}')"><icon-copy />复制特殊变量</a-button>
+          </a-space>
+        </div>
+      </a-card>
     </a-col>
   </a-row>
 </template>
@@ -90,8 +113,9 @@ import { Message } from "@arco-design/web-vue";
 import dbManager from "@/db/index.js";
 import { emit } from "@tauri-apps/api/event";
 
-const formatter = (value) => {
-  return `${Math.round((value / 50) * 100)}%`;
+const handleCopy = async (text) => {
+  await navigator.clipboard.writeText(text)  
+  Message.success('复制成功')
 };
 
 const handleAdd = async () => {
