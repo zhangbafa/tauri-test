@@ -1,8 +1,9 @@
 import { useForWithDelay } from '@/compositions/useForWithDelay.js'
 import { emit } from '@tauri-apps/api/event';
 import {useRandomPicker} from './useRandomPicker.js'
-const { fetchSpeech ,setTimeParseTime} = useForWithDelay()
+const { fetchSpeech } = useForWithDelay()
 const { getRandomElement,createCyclicPicker } = useRandomPicker()
+import { processTemplate } from '@/utils/index.js'
 import wav01 from "@/assets/wav/01.wav";
 class AudioPlaylist {
     constructor(audioList) {
@@ -69,7 +70,7 @@ class AudioPlaylist {
                 const text = currentItem; // Remove 'text:' prefix
                 try {
                     console.log(this.audioList)
-                    console.log(this.processTemplate(text))
+                    console.log(processTemplate(text))
                     // audioSource = await fetchSpeech(text,model_id);
                     // this.currentAudioURL = URL.createObjectURL(audioSource);
                     // this.audio.src = this.currentAudioURL;
@@ -124,19 +125,6 @@ class AudioPlaylist {
         this.stop();
         this.audio = null;
         this.audioList = null;
-    }
-
-    processTemplate(text) {
-        let pattern = /\{([^}]+)\}/g;
-        let newSentence = text.replace(pattern, (match, content) => {
-            if (content === 'time') {
-                return setTimeParseTime()
-            }
-            let options = content.split('|');
-            let randomIndex = Math.floor(Math.random() * options.length);
-            return options[randomIndex];
-        });
-        return newSentence
     }
 }
 

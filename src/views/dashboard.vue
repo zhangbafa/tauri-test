@@ -59,7 +59,10 @@
       <a-tab-pane key="4" title="衔接话术">
         <interrupt />
       </a-tab-pane>
-      <a-tab-pane key="5" title="系统设置">
+      <a-tab-pane key="5" title="报时话术">
+        <timeAnnouncement />
+      </a-tab-pane>
+      <a-tab-pane key="6" title="系统设置">
         <a-divider orientation="left">背景音乐</a-divider>
         <bgm />
         <a-divider orientation="left">铃声设置</a-divider>
@@ -69,7 +72,7 @@
           @update-timespeaker-range="handleTimeSpeakerRangeUpdate"
         />
       </a-tab-pane>
-      <a-tab-pane key="6" title="智景">
+      <a-tab-pane key="7" title="智景">
         <div style="padding: 10px">
           <smartscene />
         </div>
@@ -118,6 +121,10 @@ const Assistant = defineAsyncComponent(() =>
 const interrupt = defineAsyncComponent(() =>
   import("@/components/script/interrupt.vue")
 );
+const timeAnnouncement = defineAsyncComponent(() =>
+  import("@/components/script/timeAnnouncement.vue")
+);
+
 const bellsetting = defineAsyncComponent(() =>
   import("@/components/setting/bellsetting.vue")
 );
@@ -137,7 +144,7 @@ import AudioPlaylist from "@/compositions/playlist";
 import dbManager from "@/db/index.js";
 import LoopAudio from "@/compositions/loopAudio";
 import wav01 from "@/assets/wav/01.wav";
-
+import {setTimeParseTime} from '@/utils/index.js'
 import { useRoute } from "vue-router";
 import { listen,emit } from "@tauri-apps/api/event";
 
@@ -148,7 +155,7 @@ const timeRange = ref([70, 90]);
 const selectedModels = ref({});
 const { connectWebSocket, disconnectWebSocket, hudongList, currentCount } =
   useSocket();
-const { fetchSpeech, setTimeParseTime } = useForWithDelay();
+const { fetchSpeech } = useForWithDelay();
 const { startPeriodicExecution, stopPeriodicExecution } =
   useInterval(timeRange);
 const { playBlob, setVolume, setPlaybackRate } = useAudioPlayer();
@@ -165,11 +172,15 @@ const isTotalUserCount = ref(0);
 // 停止报时
 const handleStop = () => {};
 // 开始报时
+const timeScript = ref([])
 const handleAutoStart = async (e) => {
+  const result = await dbManager.query('select * from time_script')
+  
   loading.value = true;
   if (e) {
     startPeriodicExecution("", currentCount.value, async (item) => {
-      const temp = getRandomElement(shortText);
+      const temp = getRandomElement(result);
+      // console.log(temp)
       // todo 添加报直播间人数
       let totalUserCount = "";
       if (
@@ -178,7 +189,7 @@ const handleAutoStart = async (e) => {
       ) {
         totalUserCount = `直播间有${currentCount.value}位家人,`;
       }
-      const text = `${setTimeParseTime()},${totalUserCount}${temp.text}`;
+      const text = `${setTimeParseTime()},${totalUserCount}${temp.content}`;
       emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'报时：'+text})
       const audioBlob = await fetchSpeech(
         text,

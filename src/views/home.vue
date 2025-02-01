@@ -192,6 +192,16 @@ const initializeData = async () => {
     'update_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
   });
 
+  // 调用 createTable 函数创建 system_config 表
+  await dbManager.createTable('time_script', {
+    'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+    'content': 'TEXT NOT NULL',
+    'type': 'TEXT',
+    'create_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'update_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'category_id': 'INTEGER'
+  });
+
   
 
   const result = await dbManager.query('select count(*) as count from category')
