@@ -2,14 +2,14 @@
  * 基础路由
  * @type { *[] }
  */
-export const Layout = () => import("@/layout/default-layout.vue");
+export const Layout = () => import("@/layout/speech-layout.vue");
 
 const constantRouterMap = [
   {
     path: "/",
     name: "index",
     redirect:'/index',
-    component: Layout,
+    // component: Layout,
     children: [
       {
         path: "/index",
@@ -30,6 +30,21 @@ const constantRouterMap = [
         path: "/dashboard",
         name: "Dashboard",
         component: () => import("@/views/dashboard.vue"),
+        meta: {
+          ignoreCache: false,
+        },
+      },
+    ],
+  },
+  {
+    path: "/lab",
+    name: "lab",
+    component: Layout,
+    children: [
+      {
+        path: "/lab",
+        name: "Lab",
+        component: () => import("@/views/lab/index.vue"),
         meta: {
           ignoreCache: false,
         },

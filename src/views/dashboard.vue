@@ -306,19 +306,22 @@ const fetchAnchorList= async ()=>{
   return list
 }
 // 刷新主播话术
-const unlisten = listen("refreshAnchorList", async () => {
+
+
+let unlisten;
+(async ()=>{
+  unlisten = await listen("refreshAnchorList", async () => {
   const list = await fetchAnchorList()
   audioList.value.updateList(list);
   Message.success('主播刷术刷新成功')
 });
-
-
+})()
 
 // 组件挂载时自动初始化
 onMounted(initializeAudioPlaylist);
 onUnmounted(() => {
-  audioList.value.destroy();
-  unlisten();
+  audioList.value?.destroy();
+  if(unlisten) unlisten();
 });
 </script>
 

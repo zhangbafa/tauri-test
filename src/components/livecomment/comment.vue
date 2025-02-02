@@ -70,13 +70,13 @@ const fetchData = async () => {
     assistant_reply.value = await dbManager.query('select * from assistant_reply where type = 1')
 }
 fetchData()
-const handleRefresh = () => {
-    fetchData()
-}
-const unlisten = listen('refreshAssistant',()=>{
-    fetchData()
-    Message.success('助播话术刷新成功')
-})
+let unlisten;
+(async () => {
+    unlisten = await listen('refreshAssistant',()=>{
+        fetchData()
+        Message.success('助播话术刷新成功')
+    })
+})()
 // 回复评论
 const handleKeywordReplay = async (item) => {
     const model_id = selectedModels.value?.assistant_model ?? 0
@@ -115,7 +115,9 @@ const handleOpenUrl = (url) => {
 }
 
 onUnmounted(()=>{
-    unlisten()
+    if(unlisten){
+        unlisten()
+    }
 })
 </script>
 
