@@ -1,7 +1,7 @@
 <template>
     <a-row :gutter="15">
         <a-col :span="8" v-for="(item,index) in list">
-            <a-card hoverable style="margin-bottom: 15px;">
+            <a-card hoverable style="margin-bottom: 15px;" @click="handleGetProduct">
                 {{ item }}
             </a-card>
         </a-col>
@@ -22,4 +22,12 @@ const list = [
     '语音转文本',
     '获取直播间商品，然后可查询，每次1元'
 ]
+import {getDouyinLiveProducts} from '@/compositions/useHttpLab.js'
+// (async ()=>{
+//    
+// })()
+const handleGetProduct=async ()=>{
+    const result = await getDouyinLiveProducts({roomid:'380952896968',author_id:'26639637029'})
+    console.log(result)
+}
 </script>

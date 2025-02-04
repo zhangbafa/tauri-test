@@ -104,15 +104,3 @@ export {
     deleteModel,
     test
 }
-
-/**
- * 
- * const path = "E:\\BaiduNetdiskDownload\\huoyu\\火语智播\\火语智播\\tts\\Data\\models\\女模型03.pth";
-const lastIndex = path.lastIndexOf('\\');
-if (lastIndex!== -1) {
-    const fileName = path.substring(lastIndex + 1);
-    console.log(fileName);
-} else {
-    console.log('路径格式不正确，未找到分隔符');
-}
- */

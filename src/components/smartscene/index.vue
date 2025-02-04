@@ -50,9 +50,9 @@
             <smart class="canvas"/>
         </div> -->
       </a-form-item>
-      <a-card>
+      <!-- <a-card>
         <a-button @click="handleShowMark"></a-button>
-      </a-card>
+      </a-card> -->
       
 </template>
 <script setup>

@@ -38,9 +38,10 @@ export default defineConfig(async () => ({
         // 更多配置选项...
       },
       // 可以添加多个代理规则
-      '/another-api': {
-        target: 'http://another-backend.com',
+      '/tikhub': {
+        target: 'https://api.tikhub.io/api/v1/douyin/web/fetch_live_room_product_result',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/tikhub/, ''), // 路径重写（可选）
         // ...
       }
     },

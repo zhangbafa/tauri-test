@@ -54,7 +54,6 @@ const selectMusicFile = async () => {
         extensions: ['mp3', 'wav', 'ogg', 'flac', 'aac']
       }]
     })
-
     if (selected) {
       // 读取文件并创建 Blob URL
       const mimeTypes = {
@@ -76,6 +75,7 @@ const selectMusicFile = async () => {
     Message.error('加载音频文件失败：' + error.message)
   }
 }
+
 function getFileExtension(filename) {
   const match = filename.match(/\.([a-zA-Z0-9]+)$/);
   return match ? match[1] : '';
