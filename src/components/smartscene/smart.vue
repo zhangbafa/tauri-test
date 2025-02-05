@@ -1,12 +1,9 @@
 <template>
+  <a-watermark :content="watermark">
   <div class="container">
-    <!-- <div v-show="showmarks" id="dragme" class="show-mark" draggable="true" resize>
-      show marks
-    </div> -->
-    <video id="video" loop controls src=""></video>
     <canvas id="canvas"></canvas>
-    <!-- <button @click="clearImage">清除图片</button> -->
   </div>
+</a-watermark>
 </template>
 
 <script setup>
@@ -57,6 +54,7 @@ const form = reactive({
   post: "",
   isRead: false,
 });
+const watermark=ref('畅语智景,视频正在加载中...')
 
 // 图片相关变量
 const img = new Image();
@@ -79,14 +77,23 @@ const updateCanvasSize = () => {
 };
 
 onMounted(() => {
-  video = document.querySelector("video");
+  // video = document.querySelector("video");
+  video = document.createElement("video");
+  video.controls = false;
+  video.setAttribute("playsinline", "playsinline");
+  video.setAttribute("preload", "auto");
+  video.setAttribute("disablePictureInPicture", "true");
+  video.setAttribute('autoplay', 'autoplay');
+  video.setAttribute('loop','loop')
+
   canvas = document.querySelector("canvas");
   ctx = canvas.getContext("2d");
 
   window.addEventListener("resize", updateCanvasSize);
   updateCanvasSize();
 
-  video?.addEventListener("play", function () {
+  video?.addEventListener("canplay", function () {
+    watermark.value = ''
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -223,12 +230,16 @@ unlisten = listen("smartscene", (event) => {
     case "openwindow":
       draw.value = event.payload.deduplicated;
       alpha.value = event.payload.alpha;
-      document.querySelector("video").src = event.payload.src;
-      document.querySelector("video").play();
+      // document.querySelector("video").src = event.payload.src;
+      // document.querySelector("video").play();
+      video.src  = event.payload.src
+      video.play()
       break;
     case "resetplay":
-      document.querySelector("video").currentTime = 0;
-      document.querySelector("video").play();
+      // document.querySelector("video").currentTime = 0;
+      // document.querySelector("video").play();
+      video.currentTime = 0
+      video.play()
       break;
   }
 });

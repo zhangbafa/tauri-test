@@ -40,14 +40,27 @@ const constantRouterMap = [
     path: "/lab",
     name: "lab",
     component: Layout,
+    redirect: "/lab/welcome",
     children: [
       {
-        path: "/lab",
+        path: "",
         name: "Lab",
         component: () => import("@/views/lab/index.vue"),
+        children: [
+          {
+            path: "welcome",
+            name: "LabWelcome",
+            component: () => import("@/views/lab/welcome.vue")
+          },
+          {
+            path: "douyin-products",
+            name: "DouyinProducts",
+            component: () => import("@/views/lab/douyin-products.vue")
+          }
+        ],
         meta: {
           ignoreCache: false,
-        },
+        }
       },
     ],
   },
@@ -110,14 +123,14 @@ const constantRouterMap = [
   //   ]
   // },
   // {
-  //   path: "/shop",
-  //   name: "Shop",
+  //   path: "/lab",
+  //   name: "Lab",
   //   component: Layout,
   //   children: [
   //     {
-  //       path: "/shop",
+  //       path: "/lab",
   //       name: "ShopIndex",
-  //       component: () => import("@/views/shop.vue"),
+  //       component: () => import("@/views/lab/deekseep.vue"),
   //     },
   //   ],
   // }

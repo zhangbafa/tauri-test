@@ -16,7 +16,7 @@
             
           </div>
           <div class="ele-menu ele-menu-hover">
-            <RouterLink to="/lab">
+            <RouterLink to="/lab/welcome">
               <!-- <icon-experiment /> -->
             <icon-experiment size="26" strokeLinecap="round" :strokeWidth="4" />
             <div class="item">实验</div> </RouterLink>
