@@ -26,12 +26,8 @@ export function useSocket(maxListSize = 20) {
 
       // 管理列表大小
       manageListSize(hudongList);
-      // console.log(`列表长度:${hudongList.value.length}`);
-      
-
       // 清空消息队列
       messageQueue.value = [];
-      // console.log(`消息队列长度:${messageQueue.value.length}`);
     }
   }, 300, {
     leading: false,  // 不立即执行
@@ -149,39 +145,6 @@ export function useSocket(maxListSize = 20) {
           break;
           // console.log('未知消息类型');
         }
-        // console.log(newMessage)
-      // if (message.CurrentCount) {
-      //   currentCount.value = message.CurrentCount;
-      //   newMessage={
-      //     type: 'enter',
-      //     msgId: message.MsgId,
-      //     nickName: message.User?.Nickname,
-      //     avatar: message.User?.HeadImgUrl??favicon,
-      //     content: '',
-      //     secUid: message.User?.SecUid
-      //   };
-      // } else if (message.GiftId) { // 礼物消息
-      //   newMessage= {
-      //     type: 'gift',
-      //     msgId: message.MsgId,
-      //     giftName: message.GiftName,
-      //     avatar: message.ImgUrl,
-      //     nickName: message.User.Nickname,
-      //     content: message.Content,
-      //     secUid: message.User?.SecUid
-      //   }
-      // } else {
-      //   if (message.User?.Id !== 76024962349) {
-      //     newMessage= {
-      //       type: message.CurrentCount === 0 ? 'enter' : 'comment',
-      //       msgId: message.MsgId,
-      //       content: message.CurrentCount === 0 ? '' : message.Content,
-      //       nickName: message.User?.Nickname ?? '',
-      //       avatar: message.User?.HeadImgUrl ?? favicon,
-      //       secUid: message.User?.SecUid
-      //     }
-      //   }
-      // }
 
       // 如果有新消息，添加到消息队列
       if (newMessage) {

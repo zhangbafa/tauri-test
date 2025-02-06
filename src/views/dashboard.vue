@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-tabs default-active-key="1" type="card-gutter">
+    <a-tabs default-active-key="1" type="line">
       <a-tab-pane key="1">
         <template #title> <icon-home /> 主控台 </template>
         <a-space>
@@ -41,8 +41,24 @@
           </div>
           <a-row>
             <a-col :span="24">
-              <ManualBroadcast v-model="selectedModels" />
-              <comment v-model="selectedModels" :commentList="hudongList" />
+              <!--
+                <ManualBroadcast v-model="selectedModels" />
+                <comment v-model="selectedModels" :commentList="hudongList" />
+              -->
+                <!-- <a-card style="margin-top: 10px;"> -->
+                  <a-row :gutter="20">
+                    <a-col :span="10">
+                     
+                        <ManualBroadcast v-model="selectedModels" />
+                        <audiomic/>
+                        <bgm />
+                    </a-col>
+                    <a-col :span="14">
+                      <a-card title="弹幕" style="margin:20px 0;height: 58vh;"></a-card>
+                    </a-col>
+                  </a-row>
+                <!-- </a-card> -->
+                
             </a-col>
             <a-col :span="24">
               <Log />
@@ -139,6 +155,7 @@ const setting = defineAsyncComponent(() =>
 const smartscene = defineAsyncComponent(() =>
   import("@/components/smartscene/index.vue")
 );
+import audiomic from '@/components/devices/audiomic.vue'
 import { useRandomPicker } from "@/compositions/useRandomPicker";
 import AudioPlaylist from "@/compositions/playlist";
 import dbManager from "@/db/index.js";
@@ -338,6 +355,5 @@ onUnmounted(() => {
   border: 1px solid var(--color-fill-3);
   padding: 10px;
   border-radius: 5px;
-
 }
 </style>

@@ -22,6 +22,7 @@ export function useAudioPlayer() {
        const gainNode = audioContext.createGain()
        gainNode.gain.value = volume.value
        
+       
        // 连接音频处理链：source -> gainNode -> destination
        source.connect(gainNode)
        gainNode.connect(audioContext.destination)

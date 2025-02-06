@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-left: 25px;margin-bottom: 20px;">
+  <div style="margin-left: 0px;margin-bottom: 20px;">
     <a-space>
       <div>
       <a-button @click="selectMusicFile" type="primary">选择背景音乐</a-button>
@@ -17,7 +17,7 @@
         @ended="handleAudioEnd"
         @play="handleAudioPlay"
         @pause="handleAudioPause"
-        style="width: 600px;height: 35px;"
+        style="width: 400px;height: 35px;"
       ></audio>
     </div>
   </div>
