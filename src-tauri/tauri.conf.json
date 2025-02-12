@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "roi",
+  "productName": "changyu",
   "version": "0.1.0",
-  "identifier": "com.roi.app",
+  "identifier": "com.changyu.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -19,7 +19,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' https: data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://github.com; style-src 'self' 'unsafe-inline' https://github.com; media-src 'self' @fs:;",
+      "csp": "default-src 'self'; img-src 'self' https: data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://github.com; style-src 'self' 'unsafe-inline' https://github.com; media-src 'self' blob: @fs:; connect-src 'self' blob:;",
       "assetProtocol": {
         "enable": true
       }

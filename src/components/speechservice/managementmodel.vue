@@ -1,6 +1,6 @@
 <template>
     <a-space>
-        <a-button type="primary" shape="round" size="small" @click="handleUnloadedModels" >模型管理</a-button>
+        <a-button type="primary"  size="small" @click="handleUnloadedModels" >模型管理</a-button>
     </a-space>
     <a-modal title-align="start" :footer="false"    width="50%" v-model:visible="visible" @ok="handleOK" @cancel="handleCancel">
         <template #title>
@@ -17,7 +17,7 @@
                         </a-checkbox-group>               
                     </a-space>
                     <div>
-                        <a-button type="primary" @click="handleLoadModel" status="primary">确定加载</a-button>
+                        <a-button type="primary" @click="handleLoadModel" status="primary" :loading="comfigLoadinig">确定加载</a-button>
                     </div>
                 </div>
             </a-tab-pane>
@@ -38,18 +38,19 @@
                 </div>
             </a-tab-pane>
             <a-tab-pane key="3" title="配置主播语音">
+                <div style="padding: 10px 20px;">
                 <a-form :model="form">
-                <a-form-item field="anchor_model" label="选择主播AI模型">
+                <a-form-item field="anchor_model" label="选择主播模型">
                     <a-select placeholder="请选择模型" v-model="form.anchor_model">
                         <a-option v-for="(item,index) in loaded_models" :key="index" :value="item.key">{{item.name}}</a-option>                       
                     </a-select>
                 </a-form-item>
-                <a-form-item field="assistant_model" label="选择助播AI模型">
+                <a-form-item field="assistant_model" label="选择助播模型">
                     <a-select placeholder="请选择模型" v-model="form.assistant_model">
                         <a-option v-for="(item,index) in loaded_models" :key="index" :value="item.key">{{item.name}}</a-option>                       
                     </a-select>
                 </a-form-item>
-                <a-form-item field="report_model" label="选择播报AI模型">
+                <a-form-item field="report_model" label="选择播报模型">
                     <a-select placeholder="请选择模型" v-model="form.report_model">
                         <a-option v-for="(item,index) in loaded_models" :key="index" :value="item.key">{{item.name}}</a-option>                       
                     </a-select>
@@ -58,13 +59,17 @@
                     <a-button type="primary" @click="handleSelectModel" status="primary">确定</a-button>
                 </a-form-item>
             </a-form>
+        </div>
             </a-tab-pane>
         </a-tabs>
         
         
     </a-modal>
 </template>
-
+<!-- 
+E:/BaiduNetdiskDownload/ai/tts/Data/models
+E:/BaiduNetdiskDownload/ai/tts/configs/config.json
+-->
 <script setup>
 import { ref, reactive,defineModel } from 'vue'
 import { getStatus, getLoalModels, addModel,modelsInfo,deleteModel,getunloadedModels } from '@/compositions/useSpeech';
@@ -78,6 +83,7 @@ const select_models = ref([])
 const loaded_models = ref([])
 const select_loaded_models = ref([])
 
+const comfigLoadinig = ref(false)
 const handleTabClick = async (key) => {
     if(key==='2'){
         handleModelInfos()
@@ -97,7 +103,7 @@ const handleSelectModel = (value) => {
 }
 const handleModelInfos = async ()=>{
     const info = await modelsInfo()
-    let temp;
+    let temp=[];
     for (const key of Object.keys(info)) {
         const config = info[key];
         const model_name = getpath(config.model_path)
@@ -108,10 +114,10 @@ const handleModelInfos = async ()=>{
 const handleUnloadedModels = async (type=1) => {
     loaded_models.value = []
     visible.value = true;
-    const result_s = await getLoalModels(model_path)
-    console.log(result_s)
+    const result_s = await getunloadedModels(model_path)
     const result = result_s['.']
     local_models.value = result
+    console.log(result)
     /*
     const result_s = await getLoalModels(model_path)
     console.log(result_s)
@@ -138,16 +144,20 @@ const handleLoadModel = async() => {
         alert('至少选择一个模型')
         return
     }
+    comfigLoadinig.value = true
 
     // 去重，同一个模型只加载一次
     const unique_models = [...new Set(select_models.value)]
+    console.log(unique_models)
     const loadPromises = unique_models.map(item => addModel(model_path+item, config_path))
-    
+    // console.log(loadPromises)
     try {
         await Promise.all(loadPromises)
         Message.info('加载完成')
         handleUnloadedModels(1)
+        comfigLoadinig.value = false
     } catch (error) {
+        comfigLoadinig.value = false
         Message.error('加载模型时发生错误')
         console.error('加载模型错误:', error)
     }
@@ -191,9 +201,9 @@ const handleDeleteLoadedModel = async () => {
 
 // 配置角色语音
 const form = reactive({
-    anchor_model: '0',
-    assistant_model: '0',
-    report_model: '0'    
+    anchor_model: '',
+    assistant_model: '',
+    report_model: ''    
 })
 
 

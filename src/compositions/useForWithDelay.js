@@ -13,7 +13,7 @@ export function useForWithDelay() {
 
   const fetchSpeech = async (text,model_id=0) => {
     const voiceRequestConfig = {
-      baseUrl: 'http://127.0.0.1:5876/voice',
+      baseUrl: 'aiapi/voice',
       params: {
         text: text,
         model_id: model_id,

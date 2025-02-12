@@ -50,7 +50,7 @@ class AudioPlaylist {
                 this.currentIndex = 0;
             }
             this.play();
-        }, 4000);  // 2秒延迟
+        }, 1000);  // 2秒延迟
     }
     play(model_id=0) {
         if (this.isPlaying || this.currentIndex >= this.audioList.length) {
@@ -67,14 +67,15 @@ class AudioPlaylist {
             let audioSource;
             // 、、typeof currentItem === 'string' && currentItem.startsWith('text:')
             if (1) {
-                const text = currentItem; // Remove 'text:' prefix
+                const text = processTemplate(currentItem); 
                 try {
-                    console.log(this.audioList)
-                    console.log(processTemplate(text))
-                    // audioSource = await fetchSpeech(text,model_id);
-                    // this.currentAudioURL = URL.createObjectURL(audioSource);
-                    // this.audio.src = this.currentAudioURL;
-                    this.audio.src=wav01
+                   // console.log(this.audioList)
+                   // console.log(processTemplate(text))
+                    audioSource = await fetchSpeech(text,model_id);
+                    this.currentAudioURL = URL.createObjectURL(audioSource);
+                    this.audio.src = this.currentAudioURL;
+                    // this.audio.src = 'aiapi/voice?text=22&model_id=1&speaker_id=0&sdp_ratio=0.2&noise=0.2&noisew=0.9&length=1&auto_translate=false&auto_split=false&style_weight=0.7'
+                    // this.audio.src=wav01
                     emit('addLog',{time:new Date().toLocaleString(),role:'主播',logtext:text})
 
                 } catch (error) {
@@ -88,7 +89,7 @@ class AudioPlaylist {
             }
 
             // 先清理之前的资源
-            this.revokeObjectURL();
+            // this.revokeObjectURL();
             this.audio.volume = 1;
             this.audio.playbackRate = 1;
             // 确保每次播放前移除之前的事件监听器
@@ -99,6 +100,10 @@ class AudioPlaylist {
         };
 
         processAudioSource();
+    }
+
+    setVolume(volume){
+        this.audio.volume = volume
     }
 
     stop() {

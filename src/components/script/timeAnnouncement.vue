@@ -8,7 +8,7 @@
           :key="item.id"
         >
           <div style="width: 80px">话术{{ index + 1 }}</div>
-          <div style="margin: 0 auto; width: 85%;">
+          <div style="margin: 0 auto; width: 85%;padding-top: 5px">
             <a-textarea
               v-model="item.content"
               placeholder="请输入主播话术"
@@ -40,7 +40,7 @@
           </div>
         </div>
         <a-divider />
-        <div style="display: flex; justify-content: flex-end; margin: 10px">
+        <div style="display: flex; justify-content: center; margin: 10px">
           <a-button @click="handleRefresh">刷新话术</a-button>
           <a-button @click="handleAdd" type="primary" style="margin-left: 13px"
             >添加输入框</a-button
@@ -102,16 +102,19 @@
             <a-button size="mini" @click="handleCopy('{变量1|变量2}')"><icon-copy />复制普通变量</a-button>
             <a-button size="mini" @click="handleCopy('{time}')"><icon-copy />复制特殊变量</a-button>
           </a-space>
+          {{ modelValue }}
         </div>
       </a-card>
     </a-col>
   </a-row>
 </template>
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive,defineModel } from "vue";
 import { Message } from "@arco-design/web-vue";
 import dbManager from "@/db/index.js";
 import { emit } from "@tauri-apps/api/event";
+
+const modelValue = defineModel()
 
 const handleCopy = async (text) => {
   await navigator.clipboard.writeText(text)  
@@ -165,7 +168,7 @@ const handleEdit = async (item) => {
 };
 
 const handleRefresh = () => {
-  emit("refreshAnchorList");
+  emit("refreshTimeAnnouncementList");
 };
 </script>
 
@@ -173,7 +176,8 @@ const handleRefresh = () => {
 .container {
   display: flex;
   flex-direction: row;
-  align-items: last baseline;
+  /* align-items: last baseline; */
+  align-items: center;
   justify-content: space-between;
   margin: 20px;
 }

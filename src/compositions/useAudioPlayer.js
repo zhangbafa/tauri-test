@@ -1,4 +1,5 @@
 import { ref, onUnmounted, onMounted } from 'vue';
+import { listen, emit } from "@tauri-apps/api/event";
 export function useAudioPlayer() {
   const playing = ref(true)
   const volume = ref(0.5) // 添加音量控制的响应式引用
@@ -25,17 +26,6 @@ export function useAudioPlayer() {
        // 连接音频处理链：source -> gainNode -> destination
        source.connect(gainNode)
        gainNode.connect(audioContext.destination)
-       
-       // 播放完成后自动断开连接和销毁
-       source.onended = () => {
-         console.log('播放完毕')
-         playing.value = true
-         source.disconnect()
-         gainNode.disconnect()
-         source.buffer = null
-       }
-      // 连接到输出
-      // source.connect(audioContext.destination)
       
       // 播放完成后自动断开连接和销毁
       source.onended = () => {
@@ -43,6 +33,7 @@ export function useAudioPlayer() {
         playing.value = true
         source.disconnect()
         source.buffer = null // 帮助垃圾回收
+        emit('setAnchorVolume',{action:'setvolume',volume:1})
       }
       
       // 播放
@@ -51,6 +42,7 @@ export function useAudioPlayer() {
 
       source.start(0)
       // setAnchorVolume
+      emit('setAnchorVolume',{action:'setvolume',volume:0.2})
       
       return source
     } catch (error) {

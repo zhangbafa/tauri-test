@@ -19,23 +19,29 @@ const columns = [
   {
     title: "时间",
     dataIndex: "time",
-    width: 190,
+    width: 180,
   },
   {
     title: "角色",
     dataIndex: "role",
-    width: 100,
+    width: 180,
   },
   {
-    title: "日志",
-    dataIndex: "logtext",
-    ellipsis: true,
+    title: '日志',
+    dataIndex: 'logtext',
+    ellipsis: true
   },
+  
 ];
 const data = ref([]);
 
 function addLogWithLimit(newLog, maxCount = 100) {
-  data.value.unshift(newLog); // 添加新日志
+  const log = {
+    time:newLog.time,
+    role:newLog.role,
+    logtext:newLog.logtext.substring(0,60)+'...'
+  }
+  data.value.unshift(log); // 添加新日志
   if (data.value.length > maxCount) {
     data.value.splice(maxCount); // 保留最新的 maxCount 条
   }

@@ -68,7 +68,7 @@ const modelsInfo = async (root_dir) => {
 
 // 根据ID删除模型   
 const deleteModel = async (model_id) => {    
-    const url = `http://127.0.0.1:5876/models/delete?model_id=${model_id}`
+    const url = `aiapi/models/delete?model_id=${model_id}`
     const response = await fetch(url, options)
     const result = await response.json();
     return result

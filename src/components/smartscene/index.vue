@@ -44,8 +44,9 @@
             <a-button @click="handleCreateWindow">打开预览窗口</a-button>
             <a-button type="primary" @click="handleStartLive">开始直播</a-button>
         </a-space>
+        <!-- <video src="/@fs/E:/小绿点/download/轻松扫_25892332079.ts"/> -->
         <!-- /@fs/Users/zhang1/Downloads/tik.mp4 -->
-        <!-- <video src=""/>
+        <!-- 
         <div class="canvas-box">
             <smart class="canvas"/>
         </div> -->
@@ -98,7 +99,7 @@ const handleSelectVideo = async () => {
       filters: [
         {
           name: "视频文件",
-          extensions: ["mp4", "mov"],
+          extensions: ["mp4", "mov","mkv"],
         },
       ],
     });

@@ -8,7 +8,7 @@
         </template>
         <div>
             <a-form :model="form">
-                <a-form-item field="anchor_model" label="选择主播AI模型">
+                <a-form-item field="anchor_model" label="选择主播AI模型22">
                     <a-select placeholder="请选择模型" v-model="form.anchor_model">
                         <a-option v-for="(item,index) in select_models" :key="index" :value="item.key">{{item.name}}</a-option>                       
                     </a-select>

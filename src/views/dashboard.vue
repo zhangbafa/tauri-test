@@ -6,6 +6,7 @@
         <a-space>
           <a-link :hoverable="false" style="margin-left: 10px;font-size: 10px;" href="/"><icon-left /> {{ category_name }}</a-link>
         </a-space>
+       
         <div style="padding: 10px">
          
           <div style="display: flex; justify-content: space-between">
@@ -33,9 +34,7 @@
               </div>
             </a-space>
             <a-space>
-              <!-- <selectanchor v-model="selectedModels" />
-              <icon-right /> -->
-              <managementmodel />
+              <managementmodel v-model="selectedModels"/>
               <speechservice />
             </a-space>
           </div>
@@ -60,7 +59,7 @@
         <interrupt />
       </a-tab-pane>
       <a-tab-pane key="5" title="报时话术">
-        <timeAnnouncement />
+        <timeAnnouncement v-model="selectedModels"/>
       </a-tab-pane>
       <a-tab-pane key="6" title="系统设置">
         <a-divider orientation="left">背景音乐</a-divider>
@@ -147,7 +146,7 @@ import wav01 from "@/assets/wav/01.wav";
 import {setTimeParseTime} from '@/utils/index.js'
 import { useRoute } from "vue-router";
 import { listen,emit } from "@tauri-apps/api/event";
-
+import { processTemplate } from '@/utils/index.js'
 const params = useRoute();
 const { category_id = 1, category_name = "未命名直播间" } = params.query;
 document.title = category_name;
@@ -166,6 +165,8 @@ const { getRandomElement } = useRandomPicker();
 
 const isTotalUserCount = ref(0);
 
+const audioUrl = ref(null);  // 用于存储动态生成的音频 URL
+
 /**
  * 自动报时 和 铃铛
  */
@@ -174,12 +175,15 @@ const handleStop = () => {};
 // 开始报时
 const timeScript = ref([])
 const handleAutoStart = async (e) => {
-  const result = await dbManager.query('select * from time_script')
-  
+  if(!selectedModels.value?.report_model){
+      Message.error('没有选择模型')
+      return false
+  }
+  timeScript.value = await dbManager.query('select * from time_script')
   loading.value = true;
   if (e) {
     startPeriodicExecution("", currentCount.value, async (item) => {
-      const temp = getRandomElement(result);
+      const temp = getRandomElement(timeScript.value);
       // console.log(temp)
       // todo 添加报直播间人数
       let totalUserCount = "";
@@ -189,11 +193,14 @@ const handleAutoStart = async (e) => {
       ) {
         totalUserCount = `直播间有${currentCount.value}位家人,`;
       }
-      const text = `${setTimeParseTime()},${totalUserCount}${temp.content}`;
+      const tempText = processTemplate(temp.content)
+      const text = `${setTimeParseTime()},${totalUserCount}${tempText}`;
+      //添加变量
       emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'报时：'+text})
+     
       const audioBlob = await fetchSpeech(
         text,
-        selectedModels.value.report_model ?? 0
+        selectedModels.value.report_model
       );
       await playBlob(audioBlob);
     });
@@ -309,12 +316,22 @@ const fetchAnchorList= async ()=>{
 
 
 let unlisten;
+let unrefreshTimeAnnouncementList;
+let unanchorVolume;
 (async ()=>{
-  unlisten = await listen("refreshAnchorList", async () => {
-  const list = await fetchAnchorList()
-  audioList.value.updateList(list);
-  Message.success('主播刷术刷新成功')
-});
+    unlisten = await listen("refreshAnchorList", async () => {
+      const list = await fetchAnchorList()
+      audioList.value.updateList(list);
+      Message.success('主播刷术刷新成功')
+    });
+    unrefreshTimeAnnouncementList = await listen("refreshTimeAnnouncementList", async () => {
+      timeScript.value = await dbManager.query('select * from time_script')
+      Message.success('报时刷术刷新成功')
+    });
+    unanchorVolume=await listen('setAnchorVolume',async (event)=>{
+      audioList.value.setVolume(event.payload.volume)
+    })
+
 })()
 
 // 组件挂载时自动初始化
@@ -322,6 +339,7 @@ onMounted(initializeAudioPlaylist);
 onUnmounted(() => {
   audioList.value?.destroy();
   if(unlisten) unlisten();
+  if(unrefreshTimeAnnouncementList) unrefreshTimeAnnouncementList();
 });
 </script>
 

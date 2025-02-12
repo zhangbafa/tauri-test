@@ -37,6 +37,12 @@ export default defineConfig(async () => ({
         rewrite: (path) => path.replace(/^\/api/, ''), // 路径重写（可选）
         // 更多配置选项...
       },
+      '/aiapi': {
+        target: 'http://127.0.0.1:5876/', // 替换为你的后端地址
+        changeOrigin: true, // 改变 origin 头
+        rewrite: (path) => path.replace(/^\/aiapi/, ''), // 路径重写（可选）
+        // 更多配置选项...
+      },
       // 可以添加多个代理规则
       '/tikhub': {
         target: 'https://api.tikhub.io/api/v1/douyin/web/fetch_live_room_product_result',
