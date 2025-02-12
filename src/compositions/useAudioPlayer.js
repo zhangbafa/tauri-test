@@ -33,7 +33,8 @@ export function useAudioPlayer() {
         playing.value = true
         source.disconnect()
         source.buffer = null // 帮助垃圾回收
-        emit('setAnchorVolume',{action:'setvolume',volume:1})
+        // emit('setAnchorVolume',{action:'setvolume',volume:1}) 主播ai
+        emit('smartscene',{action:'setvolume',volume:1})
       }
       
       // 播放
@@ -42,7 +43,8 @@ export function useAudioPlayer() {
 
       source.start(0)
       // setAnchorVolume
-      emit('setAnchorVolume',{action:'setvolume',volume:0.2})
+      // emit('setAnchorVolume',{action:'setvolume',volume:0.2}) 主播ai
+      emit('smartscene',{action:'setvolume',volume:0.2})
       
       return source
     } catch (error) {

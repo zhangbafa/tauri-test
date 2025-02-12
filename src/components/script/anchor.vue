@@ -113,6 +113,12 @@ import { Message } from "@arco-design/web-vue";
 import dbManager from "@/db/index.js";
 import { emit } from "@tauri-apps/api/event";
 
+const props = defineProps({
+    liveid: {
+        type: Number,
+        default: 0
+    }
+})
 const handleCopy = async (text) => {
   await navigator.clipboard.writeText(text)  
   Message.success('复制成功')
@@ -123,7 +129,7 @@ const handleAdd = async () => {
     const data = {
       content: "",
       type: "",
-      category_id: 1,
+      category_id: props.liveid,
     };
     await dbManager.insert("anchor_script", data);
     // 添加后刷新数据
@@ -137,7 +143,8 @@ const anchor_script = ref([]);
 const assistant_reply = ref([]);
 const system_config = ref([]);
 const fetchData = async () => {
-  anchor_script.value = await dbManager.query("select * from anchor_script");
+  console.log('prop:'+props.liveid)
+  anchor_script.value = await dbManager.query("select * from anchor_script where category_id="+props.liveid);
 };
 fetchData();
 const handleDelete = async (id) => {

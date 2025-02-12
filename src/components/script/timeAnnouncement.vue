@@ -2,38 +2,19 @@
   <a-row :gutter="5">
     <a-col :span="18">
       <a-card style="margin: 10px">
-        <div
-          class="container"
-          v-for="(item, index) of anchor_script"
-          :key="item.id"
-        >
+        <div class="container" v-for="(item, index) of anchor_script" :key="item.id">
           <div style="width: 80px">话术{{ index + 1 }}</div>
           <div style="margin: 0 auto; width: 85%;padding-top: 5px">
-            <a-textarea
-              v-model="item.content"
-              placeholder="请输入主播话术"
-              :max-length="150"
-              auto-size
-              allow-clear
-              show-word-limit
-            />
+            <a-textarea v-model="item.content" placeholder="请输入主播话术" :max-length="150" auto-size allow-clear
+              show-word-limit />
           </div>
           <div>
             <a-space>
               <!-- <a-button type="primary"  :style="{ marginLeft: '10px' }">确定</a-button> -->
-              <a-button
-                ton
-                type="primary"
-                :style="{ marginLeft: '10px' }"
-                @click="handleEdit(item)"
-              >
+              <a-button ton type="primary" :style="{ marginLeft: '10px' }" @click="handleEdit(item)">
                 保存话术
               </a-button>
-              <a-button
-                @click="handleDelete(item.id)"
-                :style="{ marginLeft: '10px' }"
-                status="danger"
-              >
+              <a-button @click="handleDelete(item.id)" :style="{ marginLeft: '10px' }" status="danger">
                 <icon-delete />
               </a-button>
             </a-space>
@@ -42,9 +23,7 @@
         <a-divider />
         <div style="display: flex; justify-content: center; margin: 10px">
           <a-button @click="handleRefresh">刷新话术</a-button>
-          <a-button @click="handleAdd" type="primary" style="margin-left: 13px"
-            >添加输入框</a-button
-          >
+          <a-button @click="handleAdd" type="primary" style="margin-left: 13px">添加输入框</a-button>
         </div>
       </a-card>
     </a-col>
@@ -56,13 +35,7 @@
         </div>
         <div>
           <div style="display: inline-block; margin-right: 10px">语速</div>
-          <a-slider
-            :min="0.25"
-            :step="0.25"
-            :max="2"
-            :style="{ width: '83%' }"
-            show-ticks
-          />
+          <a-slider :min="0.25" :step="0.25" :max="2" :style="{ width: '83%' }" show-ticks />
         </div>
         <div style="margin-top: 15px; text-align: right">
           <a-button type="primary" size="small">确定</a-button>
@@ -86,7 +59,8 @@
           <a-typography>
             <a-typography-title :heading="6">普通变量</a-typography-title>
             <a-typography-paragraph>
-              变量使用<a-tag style="margin: 0 6px" color="arcoblue">{ }</a-tag>包括起来，每个变量用<a-tag style="margin: 0 6px" color="arcoblue"> | </a-tag>分隔开，主播在播报时会随机选择一个。例:{变量1|变量2}
+              变量使用<a-tag style="margin: 0 6px" color="arcoblue">{ }</a-tag>包括起来，每个变量用<a-tag style="margin: 0 6px"
+                color="arcoblue"> | </a-tag>分隔开，主播在播报时会随机选择一个。例:{变量1|变量2}
               <icon-copy />
             </a-typography-paragraph>
             <a-typography-paragraph>
@@ -102,31 +76,36 @@
             <a-button size="mini" @click="handleCopy('{变量1|变量2}')"><icon-copy />复制普通变量</a-button>
             <a-button size="mini" @click="handleCopy('{time}')"><icon-copy />复制特殊变量</a-button>
           </a-space>
-          {{ modelValue }}
         </div>
       </a-card>
     </a-col>
   </a-row>
 </template>
 <script setup>
-import { ref, reactive,defineModel } from "vue";
+import { ref, reactive, defineModel } from "vue";
 import { Message } from "@arco-design/web-vue";
 import dbManager from "@/db/index.js";
 import { emit } from "@tauri-apps/api/event";
 
+const props = defineProps({
+  liveid: {
+    type: Number,
+    default: 0
+  }
+})
 const modelValue = defineModel()
 
 const handleCopy = async (text) => {
-  await navigator.clipboard.writeText(text)  
+  await navigator.clipboard.writeText(text)
   Message.success('复制成功')
 };
 
 const handleAdd = async () => {
   try {
     const data = {
-      content: "",
+      content: "默认话术",
       type: "",
-      category_id: 1,
+      category_id: props.liveid,
     };
     await dbManager.insert("time_script", data);
     // 添加后刷新数据
@@ -140,7 +119,7 @@ const anchor_script = ref([]);
 const assistant_reply = ref([]);
 const system_config = ref([]);
 const fetchData = async () => {
-  anchor_script.value = await dbManager.query("select * from time_script");
+  anchor_script.value = await dbManager.query(`select * from time_script where category_id=${props.liveid}`);
 };
 fetchData();
 const handleDelete = async (id) => {

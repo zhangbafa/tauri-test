@@ -38,7 +38,8 @@ class AudioPlaylist {
     handleAudioEnd() {
         // 先移除事件监听器
         this.audio.removeEventListener('ended', this.handleAudioEnd);
-        emit('setAnchorVolume',{action:'setvolume',volume:1})
+        // emit('setAnchorVolume',{action:'setvolume',volume:1})
+        emit('smartscene',{action:'setvolume',volume:1})
         // 清理URL资源
         this.revokeObjectURL()
         this.isPlaying = false;
@@ -92,10 +93,13 @@ class AudioPlaylist {
             // this.revokeObjectURL();
             this.audio.volume = 1;
             this.audio.playbackRate = 1;
+
+
             // 确保每次播放前移除之前的事件监听器
             this.audio.removeEventListener('ended', this.handleAudioEnd);
             this.audio.addEventListener('ended', this.handleAudioEnd);
-            emit('setAnchorVolume',{action:'setvolume',volume:0.5})
+            // emit('setAnchorVolume',{action:'setvolume',volume:0.2})
+            emit('smartscene',{action:'setvolume',volume:0.2})
             this.audio.play();
         };
 
@@ -104,6 +108,10 @@ class AudioPlaylist {
 
     setVolume(volume){
         this.audio.volume = volume
+    }
+
+    setSinkId(id){
+        this.audio.setSinkId = id
     }
 
     stop() {

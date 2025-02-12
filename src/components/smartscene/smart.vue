@@ -201,8 +201,8 @@ onMounted(() => {
 unlisten = listen("smartscene", (event) => {
   switch (event.payload.action) {
     case "setpath":
-      canvas.width = 1080 / 4;
-      canvas.height = 1920 / 4;
+      canvas.width = 1080 / 2;
+      canvas.height = 1920 / 2;
       video.src = event.payload.src;
       video.addEventListener("loadeddata", () => {
         video.play().catch((e) => console.error("播放失败:", e));

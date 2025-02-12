@@ -50,16 +50,16 @@
         </div>
       </a-tab-pane>
       <a-tab-pane key="2" title="主播设置">
-        <Anchor />
+        <Anchor :liveid="category_id"/>
       </a-tab-pane>
       <a-tab-pane key="3" title="助播设置">
-        <Assistant />
+        <Assistant :liveid="category_id"/>
       </a-tab-pane>
-      <a-tab-pane key="4" title="衔接话术">
-        <interrupt />
+      <a-tab-pane key="4" title="衔接话术" disabled>
+        <interrupt :liveid="category_id"/>
       </a-tab-pane>
       <a-tab-pane key="5" title="报时话术">
-        <timeAnnouncement v-model="selectedModels"/>
+        <timeAnnouncement v-model="selectedModels" :liveid="category_id"/>
       </a-tab-pane>
       <a-tab-pane key="6" title="系统设置">
         <a-divider orientation="left">背景音乐</a-divider>
@@ -70,6 +70,8 @@
         <timespeakersetting
           @update-timespeaker-range="handleTimeSpeakerRangeUpdate"
         />
+        <a-divider orientation="left">输出设置</a-divider>
+        <outputDevice/>
       </a-tab-pane>
       <a-tab-pane key="7" title="智景">
         <div style="padding: 10px">
@@ -95,6 +97,7 @@ import { useForWithDelay } from "@/compositions/useForWithDelay.js";
 import { useInterval } from "@/compositions/useInterval.js";
 import { useAudioPlayer } from "@/compositions/useAudioPlayer.js";
 import { replayText, shortText } from "@/data/shortText.js";
+import outputDevice from '@/components/setting/outputDevice.vue'
 // 异步加载组件
 const speechservice = defineAsyncComponent(() =>
   import("@/components/speechservice/index.vue")
@@ -148,7 +151,7 @@ import { useRoute } from "vue-router";
 import { listen,emit } from "@tauri-apps/api/event";
 import { processTemplate } from '@/utils/index.js'
 const params = useRoute();
-const { category_id = 1, category_name = "未命名直播间" } = params.query;
+const { category_id = 1, category_name = "默认直播间" } = params.query;
 document.title = category_name;
 const timeRange = ref([70, 90]);
 const selectedModels = ref({});
@@ -318,6 +321,7 @@ const fetchAnchorList= async ()=>{
 let unlisten;
 let unrefreshTimeAnnouncementList;
 let unanchorVolume;
+let unsetSinkId
 (async ()=>{
     unlisten = await listen("refreshAnchorList", async () => {
       const list = await fetchAnchorList()
@@ -332,6 +336,10 @@ let unanchorVolume;
       audioList.value.setVolume(event.payload.volume)
     })
 
+    unsetSinkId=await listen('setSinkId',async (event)=>{
+      audioList.value.setSinkId(event.payload.sinkid)
+    })
+
 })()
 
 // 组件挂载时自动初始化
@@ -340,6 +348,8 @@ onUnmounted(() => {
   audioList.value?.destroy();
   if(unlisten) unlisten();
   if(unrefreshTimeAnnouncementList) unrefreshTimeAnnouncementList();
+  if(unanchorVolume) unanchorVolume()
+  if(unsetSinkId) unsetSinkId()
 });
 </script>
 

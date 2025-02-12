@@ -61,6 +61,14 @@
   import { Message } from '@arco-design/web-vue'
   import dbManager from '@/db/index.js'
   import {emit} from '@tauri-apps/api/event'
+
+  const props = defineProps({
+  liveid: {
+    type: Number,
+    default: 0
+  }
+})
+
   const form = reactive({
     name: '',
     posts: [{ value: '' },{ value: '' }]
@@ -72,7 +80,7 @@
         keyword: '',
         reply_content: '',
         type: 1,
-        category_id: 1
+        category_id: props.liveid
       }
       await dbManager.insert('assistant_reply', data)
       // 添加后刷新数据
@@ -86,7 +94,7 @@
   const assistant_reply = ref([])
   const system_config = ref([])
   const fetchData = async () => {
-    assistant_reply.value = await dbManager.query('select * from assistant_reply')
+    assistant_reply.value = await dbManager.query(`select * from assistant_reply where category_id=${props.liveid}`)
   }
   fetchData()
   const handleDelete = async (id) => {
