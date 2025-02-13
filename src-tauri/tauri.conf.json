@@ -15,7 +15,7 @@
         "title": "畅语AI智播",
         "width": 1200,
         "height": 1100,
-        "resizable": true
+        "resizable": false
       }
     ],
     "security": {

@@ -17,31 +17,6 @@ listen("show-marks", () => {
   showmarks.value = !showmarks.value;
 });
 
-onMounted(() => {
-  // const dragElement = document.getElementById("dragme");
-  // let isDraggingDiv = false;
-  // let startXDiv;
-  // let startYDiv;
-
-  // dragElement.addEventListener("mousedown", (e) => {
-  //   isDraggingDiv = true;
-  //   startXDiv = e.clientX - dragElement.offsetLeft;
-  //   startYDiv = e.clientY - dragElement.offsetTop;
-  // });
-
-  // document.addEventListener("mousemove", (e) => {
-  //   if (isDraggingDiv) {
-  //     const newX = e.clientX - startXDiv;
-  //     const newY = e.clientY - startYDiv;
-  //     dragElement.style.left = newX + "px";
-  //     dragElement.style.top = newY + "px";
-  //   }
-  // });
-
-  // document.addEventListener("mouseup", () => {
-  //   isDraggingDiv = false;
-  // });
-});
 
 let video;
 let canvas;
@@ -201,8 +176,8 @@ onMounted(() => {
 unlisten = listen("smartscene", (event) => {
   switch (event.payload.action) {
     case "setpath":
-      canvas.width = 1080 / 2;
-      canvas.height = 1920 / 2;
+      canvas.width = 1080 / 4;
+      canvas.height = 1920 / 4;
       video.src = event.payload.src;
       video.addEventListener("loadeddata", () => {
         video.play().catch((e) => console.error("播放失败:", e));
@@ -287,7 +262,7 @@ const clearImage = () => {
 };
 </script>
 
-<style scoped>
+<style >
 .container {
   position: relative;
   margin: 0 auto;
@@ -325,5 +300,8 @@ video {
   z-index: 1;
   white-space: normal;
   word-wrap: break-word;
+}
+body{
+  overflow: hidden;
 }
 </style>

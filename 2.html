@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* 定义九宫格容器样式 */
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* 定义每个格子的样式 */
+        .grid-item {
+            width: calc(100% / 3);
+            height: calc(100% / 3);
+            border: 1px solid #000;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        body{
+            margin:0;
+            padding: 0;
+        }
+    </style>
+    <title>Flexbox 九宫格布局</title>
+</head>
+
+<body>
+    <!-- 九宫格容器 -->
+    <div class="grid-container">
+        <!-- 九个格子 -->
+        <div class="grid-item">1</div>
+        <div class="grid-item">2</div>
+        <div class="grid-item">3</div>
+        <div class="grid-item">4</div>
+        <div class="grid-item">5</div>
+        <div class="grid-item">6</div>
+        <div class="grid-item">7</div>
+        <div class="grid-item">8</div>
+        <div class="grid-item">9</div>
+    </div>
+</body>
+
+</html>

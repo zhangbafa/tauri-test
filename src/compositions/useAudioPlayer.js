@@ -4,8 +4,9 @@ export function useAudioPlayer() {
   const playing = ref(true)
   const volume = ref(0.5) // 添加音量控制的响应式引用
   const playbackRate = ref(1.0); // 播放速度（默认1.0）
-
+  const deviceId = ref('')
   const audioContext = new (window.AudioContext || window.webkitAudioContext)()  
+ 
   const playBlob = async (blob) => {
     try {
       // console.log(`音量，语速：${volume.value,playbackRate.value}`)
@@ -52,6 +53,12 @@ export function useAudioPlayer() {
     }
   }
 
+  // 添加设备
+  const setDeviceId = (value) => {
+    // deviceId.value = value 
+    audioContext.setSinkId(value);
+  }
+
   // 添加设置音量的方法
   const setVolume = (value) => {
     volume.value = value // 确保音量在 0-1 之间
@@ -73,6 +80,7 @@ export function useAudioPlayer() {
     playing,
     volume,
     setVolume,
-    setPlaybackRate
+    setPlaybackRate,
+    setDeviceId
   }
 }

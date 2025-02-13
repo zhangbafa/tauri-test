@@ -7,6 +7,7 @@ class LoopAudio {
         this.isPlaying = false;
         this.volume = 1;
         this.playbackRate = 1;
+        this.deviceId = ''
         
         // 绑定方法
         this.handleAudioEnd = this.handleAudioEnd.bind(this);
@@ -45,6 +46,10 @@ class LoopAudio {
         this.audio.addEventListener('ended', this.handleAudioEnd);
         this.audio.volume = this.volume;
         this.audio.playbackRate = this.playbackRate;
+        if(this.deviceId){
+            this.audio.setSinkId(this.deviceId)
+        }
+       
         this.audio.play();
     }
 
@@ -95,6 +100,10 @@ class LoopAudio {
             clearTimeout(this.timer);
             this.scheduleNextPlay();
         }
+    }
+
+    setSinkId(value){
+        this.deviceId = value
     }
 }
 

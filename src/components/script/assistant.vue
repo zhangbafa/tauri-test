@@ -20,7 +20,7 @@
           </div>
         </div>
         <a-divider/>
-        <div style="display: flex;justify-content: flex-end;margin: 10px;">
+        <div style="display: flex;justify-content: center;margin: 10px;">
           <a-button @click="handleRefresh" >刷新话术</a-button>
           <a-button @click="handleAdd" type="primary" style="margin-left: 13px">添加输入框</a-button>
         </div>
@@ -64,7 +64,7 @@
 
   const props = defineProps({
   liveid: {
-    type: Number,
+    type: String,
     default: 0
   }
 })

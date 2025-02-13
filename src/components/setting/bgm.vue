@@ -2,38 +2,31 @@
   <div style="margin-left: 25px;margin-bottom: 20px;">
     <a-space>
       <div>
-      <a-button @click="selectMusicFile" type="primary">选择背景音乐</a-button>
-    </div>
-    <div style="margin: 20px"  v-if="audioSrc">      
-      <a-switch v-model="enableLoop" @change="handleLoopChange"/>
-      <span style="margin: 0 10px;">循环{{ enableLoop ? '开启' : '关闭' }}</span>
-    </div>
+        <a-button @click="selectMusicFile" type="primary">选择背景音乐</a-button>
+      </div>
+      <div style="margin: 20px" v-if="audioSrc">
+        <a-switch v-model="enableLoop" @change="handleLoopChange" />
+        <span style="margin: 0 10px;">循环{{ enableLoop ? '开启' : '关闭' }}</span>
+      </div>
     </a-space>
     <div v-if="audioSrc" style="margin-top: 10px;">
-      <audio 
-        ref="audioPlayer" 
-        :src="audioSrc" 
-        controls 
-        @ended="handleAudioEnd"
-        @play="handleAudioPlay"
-        @pause="handleAudioPause"
-        style="width: 600px;height: 35px;"
-      ></audio>
+      <!-- 使用 Audio 对象播放音频，不再需要 <audio> 标签 -->
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { open } from '@tauri-apps/plugin-dialog'
 import { readFile } from '@tauri-apps/plugin-fs'
 import { Message } from '@arco-design/web-vue'
-import { emit } from '@tauri-apps/api/event'
+import { emit,listen } from '@tauri-apps/api/event'
 import {convertFileSrc} from '@tauri-apps/api/core'
-const audioSrc = ref('')
-const audioPlayer = ref(null)
-const enableLoop = ref(true)
 
+const audioSrc = ref('')
+const audioPlayer = ref(new Audio())
+const enableLoop = ref(true)
+audioPlayer.value.loop = enableLoop.value
 const handleAudioPlay = () => {
   // 发送事件降低视频音量
   emit('custom-event', { action: 'volume', volume: 0.2 })
@@ -67,6 +60,9 @@ const selectMusicFile = async () => {
       const fileData = await readFile(selected)
       const blob = new Blob([fileData], { type: mime })
       audioSrc.value = URL.createObjectURL(blob)
+      audioPlayer.value.src = audioSrc.value
+      
+      audioPlayer.value.play()
       // 提示
       Message.success('音频文件加载成功')
     }
@@ -80,35 +76,30 @@ function getFileExtension(filename) {
   const match = filename.match(/\.([a-zA-Z0-9]+)$/);
   return match ? match[1] : '';
 }
+
 const handleLoopChange = (checked) => {
   enableLoop.value = checked
-  
-  if (audioPlayer.value) {
-    audioPlayer.value.loop = checked
-    
-    // 如果不循环且正在播放，播放完当前音频后停止
-    if (!checked) {
-      audioPlayer.value.addEventListener('ended', () => {
-        audioPlayer.value.pause()
-      }, { once: true })
-    }
-  }
+  audioPlayer.value.loop = checked
 }
 
-const handleAudioEnd = () => {
-  // 如果不是循环模式，可以在这里添加额外的处理逻辑
-  if (!enableLoop.value) {
-    console.log('音频播放结束')
-    emit('custom-event', { action: 'volume', volume: 1.0 })
-  }
-}
+let unlisten;
+(async()=>{
+  unlisten=await listen('setSinkId',(event)=>{
+    const deviceId = event.payload.sinkid
+    audioPlayer.value.setSinkId(deviceId)
+  })
+})()
+onMounted(() => {
+  audioPlayer.value.addEventListener('play', handleAudioPlay)
+  audioPlayer.value.addEventListener('pause', handleAudioPause)
+})
 
-// 监听音频源变化
-watch(audioSrc, (newSrc) => {
-  if (newSrc && audioPlayer.value) {
-    audioPlayer.value.src = newSrc
-    audioPlayer.value.play()
-  }
+onBeforeUnmount(() => {
+  audioPlayer.value.removeEventListener('play', handleAudioPlay)
+  audioPlayer.value.removeEventListener('pause', handleAudioPause)
+  audioPlayer.value.pause()
+  URL.revokeObjectURL(audioSrc.value)
+  unlisten()
 })
 </script>
 

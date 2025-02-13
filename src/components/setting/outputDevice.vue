@@ -1,6 +1,6 @@
 <template>
   <!-- {{ audioOutputDevice }} -->
-  <a-form ref="formRef" size="large" :model="form" :style="{ width: '600px' }" @submit="handleSubmit">
+  <a-form ref="formRef" size="large" :model="form" :style="{ width: '600px' }">
     <a-form-item field="audioOutput" label="音频输出">
       <a-select v-model="form.audioOutput" placeholder="请选择" allow-clear @change="handleSetOutput">
         <a-option :value="item.deviceId" v-for="item in audioOutputDevice">{{ item.label }}</a-option>
@@ -52,7 +52,6 @@ onMounted(() => {
 });
 
 const handleSetOutput=(e)=>{
-  console.log(e)
   emit('setSinkId',{sinkid:e})
 }
 </script>

@@ -160,7 +160,7 @@ const { connectWebSocket, disconnectWebSocket, hudongList, currentCount } =
 const { fetchSpeech } = useForWithDelay();
 const { startPeriodicExecution, stopPeriodicExecution } =
   useInterval(timeRange);
-const { playBlob, setVolume, setPlaybackRate } = useAudioPlayer();
+const { playBlob, setVolume, setPlaybackRate,setDeviceId } = useAudioPlayer();
 const text = ref("");
 const loading = ref(false);
 
@@ -337,7 +337,15 @@ let unsetSinkId
     })
 
     unsetSinkId=await listen('setSinkId',async (event)=>{
-      audioList.value.setSinkId(event.payload.sinkid)
+      const deviceId = event.payload.sinkid
+      // 设置主播ai
+      audioList.value.setSinkId(deviceId)
+      // 设置报时
+      setDeviceId(deviceId)
+      // 设置铃铛
+      bellAudio.setSinkId(deviceId);
+      // 设置背景音乐
+
     })
 
 })()

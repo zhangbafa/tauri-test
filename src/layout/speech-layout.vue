@@ -30,18 +30,7 @@
         </div>
   
         <div class="ele-footer-menu" style="display: none;">
-          <div class="ele-menu">
-            <RouterLink to="/">
-            <component :is="dark ? 'icon-moon-fill' : 'icon-sun'" size="22"  strokeLinecap="round" :strokeWidth="4" :style="{color:'rgb(78,89,105)'}"/>
-            <div class="item">{{ dark?'夜间':'日间' }}</div>
-          </RouterLink>
-          </div>
-          <div class="ele-menu">
-            <RouterLink to="/">
-            <icon-settings size="22" strokeLinecap="round" :strokeWidth="4" :style="{color:'rgb(78,89,105)'}"/>
-            <div class="item">设置</div>
-          </RouterLink>
-          </div>
+          
         </div>
       </a-layout-sider>
       <a-layout>
