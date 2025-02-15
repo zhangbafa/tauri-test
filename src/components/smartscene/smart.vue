@@ -208,6 +208,7 @@ unlisten = listen("smartscene", (event) => {
       // document.querySelector("video").src = event.payload.src;
       // document.querySelector("video").play();
       video.src  = event.payload.src
+      console.log(event.payload)
       video.play()
       break;
     case "resetplay":

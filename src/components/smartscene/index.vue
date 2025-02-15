@@ -1,5 +1,5 @@
 <template>
-    
+     
      <a-form :model="form"  :style="{width:'800px'}">
         <a-form-item field="videoPath" label="视频文件" label-col-flex="100px">
             <a-input v-model="form.videoPath" placeholder="" />
@@ -44,16 +44,19 @@
             <a-button @click="handleCreateWindow">打开预览窗口</a-button>
             <a-button type="primary" @click="handleStartLive">开始直播</a-button>
         </a-space>
+        
         <!-- <video src="/@fs/E:/小绿点/download/轻松扫_25892332079.ts"/> -->
         <!-- /@fs/Users/zhang1/Downloads/tik.mp4 -->
-        <!-- 
+        
         <div class="canvas-box">
-            <smart class="canvas"/>
-        </div> -->
+          <video controls src="/@fs/E:/111.mp4" style="width: 100px;height: 100px;"/>
+            <!-- <smart class="canvas"/> -->
+        </div> 
       </a-form-item>
       <!-- <a-card>
         <a-button @click="handleShowMark"></a-button>
       </a-card> -->
+     
       
 </template>
 <script setup>
@@ -78,8 +81,10 @@ const handleCreateWindow=()=>{
         return false
     }
     createNewWindow('#/video','畅语智景')
+    const a = convertFileSrc(form.videoPath)
+   
     setTimeout(()=>{
-        emit('smartscene',{action:'openwindow',src:convertFileSrc(form.videoPath),alpha:form.alpha,deduplicated:form.deduplicated})
+        emit('smartscene',{action:'openwindow',src:a,alpha:form.alpha,deduplicated:form.deduplicated})
     },2000)
     emit('addLog',{time:new Date().toLocaleString(),role:'用户','logtext':'打开了畅语智景窗口'})
 }
@@ -99,7 +104,7 @@ const handleSelectVideo = async () => {
       filters: [
         {
           name: "视频文件",
-          extensions: ["mp4", "mov","mkv"],
+          extensions: ["mp4", "mov","mkv",'ts'],
         },
       ],
     });
