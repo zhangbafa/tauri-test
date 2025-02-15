@@ -1,32 +1,37 @@
 <template>
-  <div>
+  <div style="position: relative;">
+    <div style="position: absolute;top:0;right:0;z-index: 10;margin-top: 4px;">
+      <a-space>
+        <a-link :hoverable="false" style="margin-left: 10px;font-size: 12px;" href="/"><icon-left /> {{ category_name
+          }}</a-link>
+        <span style="font-size:12px">软件有效期至: 2025-10-10</span>
+      </a-space>
+    </div>
     <a-tabs default-active-key="1" type="card-gutter">
-      <a-tab-pane key="1">
+      <a-tab-pane key="1" style="height: 95vh;overflow-y: auto;">
         <template #title> <icon-home /> 主控台 </template>
-        <a-space>
-          <a-link :hoverable="false" style="margin-left: 10px;font-size: 10px;" href="/"><icon-left /> {{ category_name }}</a-link>
-        </a-space>
-       
+
+
         <div style="padding: 10px">
-         
+
           <div style="display: flex; justify-content: space-between">
             <a-space>
               <div class="baoshi-box">
                 <a-space>
-                  <a-switch v-model="enableAnchor" @change="handleKaiqi" checked-color="#F53F3F"/>
+                  <a-switch v-model="enableAnchor" @change="handleKaiqi" checked-color="#F53F3F" />
                   主播AI{{ enableAnchor ? "开启" : "关闭" }}
                 </a-space>
               </div>
               <div class="baoshi-box">
                 <a-space>
-                  <a-switch @change="handleAutoStart"  /> 自动报时
+                  <a-switch @change="handleAutoStart" /> 自动报时
                   <icon-right />
-                  <a-switch @change="handleBell"  /> 开启铃铛
+                  <a-switch @change="handleBell" /> 开启铃铛
                 </a-space>
               </div>
               <div class="ws-box">
                 <a-space>
-                  <a-switch @change="handleConnentDanMu" checked-color="#00B42A"/> 连接弹幕服务
+                  <a-switch @change="handleConnentDanMu" checked-color="#00B42A" /> 连接弹幕服务
                   <icon-right />
                   直播间人数
                   <a-link :hoverable="false">{{ currentCount }}</a-link>
@@ -34,7 +39,7 @@
               </div>
             </a-space>
             <a-space>
-              <managementmodel v-model="selectedModels"/>
+              <managementmodel v-model="selectedModels" />
               <speechservice />
             </a-space>
           </div>
@@ -49,31 +54,29 @@
           </a-row>
         </div>
       </a-tab-pane>
-      <a-tab-pane key="2" title="主播设置">
-        <Anchor :liveid="category_id"/>
+      <a-tab-pane key="2" title="主播设置" style="height: 95vh;overflow-y: auto;">
+        <Anchor :liveid="category_id" />
       </a-tab-pane>
-      <a-tab-pane key="3" title="助播设置">
-        <Assistant :liveid="category_id"/>
+      <a-tab-pane key="3" title="助播设置" style="height: 95vh;overflow-y: auto;">
+        <Assistant :liveid="category_id" />
       </a-tab-pane>
-      <a-tab-pane key="4" title="衔接话术" disabled>
-        <interrupt :liveid="category_id"/>
+      <a-tab-pane key="4" title="衔接话术" disabled style="height: 95vh;overflow-y: auto;">
+        <interrupt :liveid="category_id" />
       </a-tab-pane>
-      <a-tab-pane key="5" title="报时话术">
-        <timeAnnouncement v-model="selectedModels" :liveid="category_id"/>
+      <a-tab-pane key="5" title="报时话术" style="height: 95vh;overflow-y: auto;">
+        <timeAnnouncement v-model="selectedModels" :liveid="category_id" />
       </a-tab-pane>
-      <a-tab-pane key="6" title="系统设置">
+      <a-tab-pane key="6" title="系统设置" style="height: 95vh;overflow-y: auto;">
         <a-divider orientation="left">背景音乐</a-divider>
         <bgm />
         <a-divider orientation="left">铃声设置</a-divider>
         <bellsetting @update-bell-time-range="handleTimeRangeUpdate" />
         <a-divider orientation="left">报时设置</a-divider>
-        <timespeakersetting
-          @update-timespeaker-range="handleTimeSpeakerRangeUpdate"
-        />
+        <timespeakersetting @update-timespeaker-range="handleTimeSpeakerRangeUpdate" />
         <a-divider orientation="left">输出设置</a-divider>
-        <outputDevice/>
+        <outputDevice />
       </a-tab-pane>
-      <a-tab-pane key="7" title="智景">
+      <a-tab-pane key="7" title="智景" style="height: 95vh;overflow-y: auto;">
         <div style="padding: 10px">
           <smartscene />
         </div>
@@ -146,9 +149,9 @@ import AudioPlaylist from "@/compositions/playlist";
 import dbManager from "@/db/index.js";
 import LoopAudio from "@/compositions/loopAudio";
 import wav01 from "@/assets/wav/01.wav";
-import {setTimeParseTime} from '@/utils/index.js'
+import { setTimeParseTime } from '@/utils/index.js'
 import { useRoute } from "vue-router";
-import { listen,emit } from "@tauri-apps/api/event";
+import { listen, emit } from "@tauri-apps/api/event";
 import { processTemplate } from '@/utils/index.js'
 const params = useRoute();
 const { category_id = 1, category_name = "默认直播间" } = params.query;
@@ -160,7 +163,7 @@ const { connectWebSocket, disconnectWebSocket, hudongList, currentCount } =
 const { fetchSpeech } = useForWithDelay();
 const { startPeriodicExecution, stopPeriodicExecution } =
   useInterval(timeRange);
-const { playBlob, setVolume, setPlaybackRate,setDeviceId } = useAudioPlayer();
+const { playBlob, setVolume, setPlaybackRate, setDeviceId } = useAudioPlayer();
 const text = ref("");
 const loading = ref(false);
 
@@ -174,13 +177,13 @@ const audioUrl = ref(null);  // 用于存储动态生成的音频 URL
  * 自动报时 和 铃铛
  */
 // 停止报时
-const handleStop = () => {};
+const handleStop = () => { };
 // 开始报时
 const timeScript = ref([])
 const handleAutoStart = async (e) => {
-  if(!selectedModels.value?.report_model){
-      Message.error('没有选择模型')
-      return false
+  if (!selectedModels.value?.report_model) {
+    Message.error('没有选择模型')
+    return false
   }
   timeScript.value = await dbManager.query('select * from time_script')
   loading.value = true;
@@ -199,8 +202,8 @@ const handleAutoStart = async (e) => {
       const tempText = processTemplate(temp.content)
       const text = `${setTimeParseTime()},${totalUserCount}${tempText}`;
       //添加变量
-      emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'报时：'+text})
-     
+      emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: '报时：' + text })
+
       const audioBlob = await fetchSpeech(
         text,
         selectedModels.value.report_model
@@ -209,7 +212,7 @@ const handleAutoStart = async (e) => {
     });
   } else {
     stopPeriodicExecution();
-    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'关闭定时报时'})
+    emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: '关闭定时报时' })
     loading.value = false;
   }
 };
@@ -220,11 +223,11 @@ const handleBell = async (e) => {
   if (e) {
     // console.log('开启铃铛')
     bellAudio.start();
-    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'播放铃铛声音'})
+    emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: '播放铃铛声音' })
   } else {
     // console.log('关闭铃铛')
     bellAudio.stop();
-    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'关闭铃铛'})
+    emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: '关闭铃铛' })
   }
 };
 // 更新铃铛时间范围
@@ -249,7 +252,7 @@ const handleTimeSpeakerRangeUpdate = (
 const handleConnentDanMu = (e) => {
   if (e) {
     connectWebSocket();
-    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'成功连接弹幕服务'})
+    emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: '成功连接弹幕服务' })
   } else {
     disconnectWebSocket(false);
   }
@@ -301,7 +304,7 @@ const handleKaiqi = () => {
     audioList.value.stop();
   }
 };
-const fetchAnchorList= async ()=>{
+const fetchAnchorList = async () => {
   const result = await dbManager.query(
     "select * from anchor_script where category_id = ?",
     [category_id]
@@ -322,31 +325,31 @@ let unlisten;
 let unrefreshTimeAnnouncementList;
 let unanchorVolume;
 let unsetSinkId
-(async ()=>{
-    unlisten = await listen("refreshAnchorList", async () => {
-      const list = await fetchAnchorList()
-      audioList.value.updateList(list);
-      Message.success('主播刷术刷新成功')
-    });
-    unrefreshTimeAnnouncementList = await listen("refreshTimeAnnouncementList", async () => {
-      timeScript.value = await dbManager.query('select * from time_script')
-      Message.success('报时刷术刷新成功')
-    });
-    unanchorVolume=await listen('setAnchorVolume',async (event)=>{
-      audioList.value.setVolume(event.payload.volume)
-    })
+(async () => {
+  unlisten = await listen("refreshAnchorList", async () => {
+    const list = await fetchAnchorList()
+    audioList.value.updateList(list);
+    Message.success('主播刷术刷新成功')
+  });
+  unrefreshTimeAnnouncementList = await listen("refreshTimeAnnouncementList", async () => {
+    timeScript.value = await dbManager.query('select * from time_script')
+    Message.success('报时刷术刷新成功')
+  });
+  unanchorVolume = await listen('setAnchorVolume', async (event) => {
+    audioList.value.setVolume(event.payload.volume)
+  })
 
-    unsetSinkId=await listen('setSinkId',async (event)=>{
-      const deviceId = event.payload.sinkid
-      // 设置主播ai
-      audioList.value.setSinkId(deviceId)
-      // 设置报时
-      setDeviceId(deviceId)
-      // 设置铃铛
-      bellAudio.setSinkId(deviceId);
-      // 设置背景音乐
+  unsetSinkId = await listen('setSinkId', async (event) => {
+    const deviceId = event.payload.sinkid
+    // 设置主播ai
+    audioList.value.setSinkId(deviceId)
+    // 设置报时
+    setDeviceId(deviceId)
+    // 设置铃铛
+    bellAudio.setSinkId(deviceId);
+    // 设置背景音乐
 
-    })
+  })
 
 })()
 
@@ -354,10 +357,10 @@ let unsetSinkId
 onMounted(initializeAudioPlaylist);
 onUnmounted(() => {
   audioList.value?.destroy();
-  if(unlisten) unlisten();
-  if(unrefreshTimeAnnouncementList) unrefreshTimeAnnouncementList();
-  if(unanchorVolume) unanchorVolume()
-  if(unsetSinkId) unsetSinkId()
+  if (unlisten) unlisten();
+  if (unrefreshTimeAnnouncementList) unrefreshTimeAnnouncementList();
+  if (unanchorVolume) unanchorVolume()
+  if (unsetSinkId) unsetSinkId()
 });
 </script>
 
@@ -374,6 +377,9 @@ onUnmounted(() => {
   border: 1px solid var(--color-fill-3);
   padding: 10px;
   border-radius: 5px;
+}
 
+.arco-tabs-content {
+  padding-top: 0
 }
 </style>

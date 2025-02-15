@@ -3,8 +3,8 @@
     <a-col :span="18">
       <div style="margin: 10px">
         <div  v-for="(item, index) of anchor_script" :key="item.id" class="card-box">
-          <a-card style="margin-top: 10px;padding:0" size="mini">
-            <template #actions>
+          <a-card style="margin-top: 10px;padding:0;background-color: var(--color-fill-2);" size="mini">
+            <template #actions v-if="active==item.id">
                 <a-button type="primary" :style="{ marginLeft: '10px' }" @click="handleEdit(item)" size="mini">
                   保存
                 </a-button>
@@ -16,6 +16,7 @@
             </template>
             <div style="margin: 0 auto; width:100%;position: relative;">
               <a-textarea v-model="item.content" placeholder="请输入主播话术" :max-length="150" :auto-size="{maxRows:5,minRows:2}" allow-clear
+             @focus="handleFocus(item.id)"
                 show-word-limit />
             </div>
           </a-card>
@@ -91,6 +92,10 @@ const props = defineProps({
   }
 })
 
+const active = ref(0)
+const handleFocus= (id)=>{
+  active.value = id
+}
 const handleCopy = async (text) => {
   await navigator.clipboard.writeText(text)
   Message.success('复制成功')

@@ -172,10 +172,10 @@ const initializeData = async () => {
   });
 
   // 调用 createTable 函数创建 assistant_reply 表
-  await dbManager.createTable('assistant_reply', {
+  await dbManager.createTable('assistant_script', {
     'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
     'keyword': 'TEXT NOT NULL',
-    'reply_content': 'TEXT NOT NULL',
+    'content': 'TEXT NOT NULL',
     'category_id': 'INTEGER',
     'type': 'INTEGER',
     'create_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
