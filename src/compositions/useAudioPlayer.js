@@ -45,7 +45,7 @@ export function useAudioPlayer() {
       source.start(0)
       // setAnchorVolume
       // emit('setAnchorVolume',{action:'setvolume',volume:0.2}) 主播ai
-      emit('smartscene',{action:'setvolume',volume:0.2})
+      emit('smartscene',{action:'setvolume',volume:0})
       
       return source
     } catch (error) {

@@ -1,6 +1,6 @@
 <template>
-  <!-- {{ audioOutputDevice }} -->
-  <a-form ref="formRef" size="large" :model="form" :style="{ width: '600px' }">
+  <div class="baoshi-box" style="margin-top: 20px; margin-bottom: 10px">
+  <a-form ref="formRef" size="large" :model="form" >
     <a-form-item field="audioOutput" label="音频输出">
       <a-select v-model="form.audioOutput" placeholder="请选择" allow-clear @change="handleSetOutput">
         <a-option :value="item.deviceId" v-for="item in audioOutputDevice">{{ item.label }}</a-option>
@@ -12,7 +12,7 @@
       </a-select>
     </a-form-item>
   </a-form>
-
+</div>
 </template>
 <script setup>
 import { ref, onMounted, reactive } from 'vue'

@@ -1,7 +1,7 @@
 <template>
-  <div class="baoshi-box" style="margin-top: 20px;margin-bottom: 10px;">
-    <a-input type="text" v-model="inputText"  placeholder="请输入播报内容 回车发送" @press-enter="handleBroadcast" allow-clear />
-  </div>
+  <a-card style="margin-top: 10px">
+    <a-input type="text" v-model="inputText" placeholder="请输入播报内容 回车发送" @press-enter="handleBroadcast" allow-clear />
+  </a-card>
 </template>
 
 <script setup>
@@ -30,13 +30,3 @@ const handleBroadcast = async () => {
   }, 1000)
 }
 </script>
-
-
-<style>
-.baoshi-box {
-  background-color: var(--color-fill-1);
-  border: 1px solid var(--color-fill-3);
-  padding: 10px;
-  border-radius: 5px;
-}
-</style>

@@ -12,7 +12,7 @@
         <template #title> <icon-home /> 主控台 </template>
 
 
-        <div style="padding: 10px">
+        <div style="padding: 20px 10px">
 
           <div style="display: flex; justify-content: space-between">
             <a-space>
@@ -39,14 +39,29 @@
               </div>
             </a-space>
             <a-space>
-              <managementmodel v-model="selectedModels" />
+              
               <speechservice />
             </a-space>
           </div>
           <a-row>
             <a-col :span="24">
-              <ManualBroadcast v-model="selectedModels" />
-              <comment v-model="selectedModels" :commentList="hudongList" />
+              <!-- <ManualBroadcast v-model="selectedModels" />
+              <comment v-model="selectedModels" :commentList="hudongList" /> -->
+              <a-row :gutter="20">
+                    <a-col :span="10">
+                        <a-divider orientation="left">插入播报</a-divider>               
+                         <ManualBroadcast v-model="selectedModels" />
+                         <a-divider orientation="left">选择设备</a-divider>   
+                         <outputDevice/>
+                         <a-divider orientation="left">调音器</a-divider>
+                         <outputIndex/>
+                         <a-divider orientation="left">Other</a-divider>
+                         <managementmodel v-model="selectedModels" />
+                    </a-col>
+                    <a-col :span="14">
+                      <a-card title="弹幕" style="margin:20px 0;height: 58vh;"></a-card>
+                    </a-col>
+                  </a-row>
             </a-col>
             <a-col :span="24">
               <Log />
@@ -74,7 +89,7 @@
         <a-divider orientation="left">报时设置</a-divider>
         <timespeakersetting @update-timespeaker-range="handleTimeSpeakerRangeUpdate" />
         <a-divider orientation="left">输出设置</a-divider>
-        <outputDevice />
+       
       </a-tab-pane>
       <a-tab-pane key="7" title="智景" style="height: 95vh;overflow-y: auto;">
         <div style="padding: 10px">
@@ -100,7 +115,8 @@ import { useForWithDelay } from "@/compositions/useForWithDelay.js";
 import { useInterval } from "@/compositions/useInterval.js";
 import { useAudioPlayer } from "@/compositions/useAudioPlayer.js";
 import { replayText, shortText } from "@/data/shortText.js";
-import outputDevice from '@/components/setting/outputDevice.vue'
+import outputDevice from '@/components/devices/outputDevice.vue'
+import outputIndex from '@/components/devices/index.vue'
 // 异步加载组件
 const speechservice = defineAsyncComponent(() =>
   import("@/components/speechservice/index.vue")
@@ -185,7 +201,7 @@ const handleAutoStart = async (e) => {
     Message.error('没有选择模型')
     return false
   }
-  timeScript.value = await dbManager.query('select * from time_script')
+  timeScript.value = await dbManager.query(`select * from time_script where category_id=${category_id}`)
   loading.value = true;
   if (e) {
     startPeriodicExecution("", currentCount.value, async (item) => {
@@ -272,7 +288,6 @@ const isAudioLoading = ref(false); // 加载状态
 const audioError = ref(null); // 错误追踪
 const enableAnchor = ref(false);
 const initializeAudioPlaylist = async () => {
-  console.log('start')
   try {
     // 开始加载
     isAudioLoading.value = true;
@@ -353,8 +368,36 @@ let unsetSinkId
 
 })()
 
+//启动服务
+import {useChildProcess} from  '@/compositions/useChildProcess'
+// 开启、关闭http服务
+const {startHttpServer,checkServerStatus} = useChildProcess()
+const startAIService=async (e)=>{
+    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'正在启动 AI 服务'})
+    try {
+        await startHttpServer()
+        let timer = null
+        timer = setInterval(async () => {
+            const result = await checkServerStatus()
+            if(result){
+                clearInterval(timer)
+                Message.info('启动成功')
+                emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'AI 服务启动成功'})
+                return true
+            }
+        },1000)
+      
+    } catch (error) {
+        Message.info('服务启动失败')
+        emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'AI 服务启动失败'})
+    }
+}
 // 组件挂载时自动初始化
-onMounted(initializeAudioPlaylist);
+onMounted(()=>{
+  initializeAudioPlaylist()
+  startAIService()
+  if(import.meta.env.DEV){}
+});
 onUnmounted(() => {
   audioList.value?.destroy();
   if (unlisten) unlisten();
