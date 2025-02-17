@@ -82,14 +82,12 @@
         <timeAnnouncement v-model="selectedModels" :liveid="category_id" />
       </a-tab-pane>
       <a-tab-pane key="6" title="系统设置" style="height: 95vh;overflow-y: auto;">
-        <a-divider orientation="left">背景音乐</a-divider>
-        <bgm />
         <a-divider orientation="left">铃声设置</a-divider>
         <bellsetting @update-bell-time-range="handleTimeRangeUpdate" />
         <a-divider orientation="left">报时设置</a-divider>
         <timespeakersetting @update-timespeaker-range="handleTimeSpeakerRangeUpdate" />
-        <a-divider orientation="left">输出设置</a-divider>
-       
+        <a-divider orientation="left">背景音乐</a-divider>
+        <bgm />
       </a-tab-pane>
       <a-tab-pane key="7" title="智景" style="height: 95vh;overflow-y: auto;">
         <div style="padding: 10px">
