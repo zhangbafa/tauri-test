@@ -1,9 +1,9 @@
 <template>
-    <a-row :gutter="20" style="margin-top: 10px;">
+    <a-row :gutter="20">
         <a-col :span="16">
 
             <a-list :virtualListProps="{
-                height: 400,
+                height: 560,
             }" :data="commentList">
                 <template #item="{ item, index }">
                     <a-list-item :key="item.msgId">
@@ -17,6 +17,7 @@
                         </span>
                         <span v-show="item.type == 5">送出了 {{ item.giftName }}</span>
                         <span v-show="item.type == 3">进入直播间</span>
+                        <span v-show="item.type == 2">点赞:{{ item.count }},共点赞:{{ item.total }}</span>
                         <template #actions>
                             <icon-play-circle-fill size="22" @click="handlePlayHudong(item)" />
                         </template>
@@ -27,7 +28,6 @@
 
         </a-col>
         <a-col :span="8" style="position: relative;">
-
             <a-list :data="assistant_reply" :virtualListProps="{
                 height: 400,
             }" >
@@ -58,7 +58,11 @@ const props = defineProps({
     commentList: {
         type: Array,
         default: () => []
-    }
+    },
+    giftList: {
+        type: Array,
+        default: () => []
+    },
 })
 
 const { playBlob, close, playing } = useAudioPlayer()

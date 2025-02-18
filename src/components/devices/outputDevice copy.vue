@@ -7,13 +7,13 @@
       </a-select>
     </a-form-item>
     <a-form-item field="audioInput" label="音频输入">
-      <a-select v-model="form.audioInput" placeholder="请选择" allow-clear @change="handleSetInput">
+      <a-select v-model="form.audioInput" placeholder="请选择" allow-clear>
         <a-option :value="item.deviceId" v-for="item in audioInputDevice">{{ item.label }}</a-option>
       </a-select>
     </a-form-item>
-    <!-- <a-form-item field="audioInput" label="音频输入">
+    <a-form-item field="audioInput" label="音频输入">
       <a-button @click="handleTestMic">测试麦克风</a-button>
-    </a-form-item> -->
+    </a-form-item>
   </a-form>
 </div>
 </template>
@@ -57,28 +57,10 @@ onMounted(() => {
 const handleSetOutput=(e)=>{
   emit('setSinkId',{sinkid:e})
 }
-const handleSetInput=(e)=>{
-  console.log(form.audioInput)
-}
+
 // 测试麦克风
 const handleTestMic = () => {
   const audioContext = new AudioContext();
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = 'zh-CN';
-  recognition.continuous = true;
-  recognition.interimResults = true;
-
-  recognition.onresult = (event) => {
-    const result = event.results[event.results.length - 1];
-    if (result.isFinal) {
-      console.log('识别结果:', result[0].transcript);
-    }
-  };
-
-  recognition.onerror = (event) => {
-    console.error('语音识别错误:', event.error);
-  };
-
   navigator.mediaDevices.getUserMedia({ audio: true })
     .then(stream => {
       const source = audioContext.createMediaStreamSource(stream);
@@ -87,31 +69,21 @@ const handleTestMic = () => {
       source.connect(analyser);
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
-      let isRecognizing = false;
-
       const draw = () => {
-        analyser.getByteFrequencyData(dataArray);
-        const max = Math.max(...dataArray);
-        // console.log(max);
-        if (max > 100) {
-          // console.log('麦克风有声音');
-          if (!isRecognizing) {
-            recognition.start();
-            isRecognizing = true;
-          }
-        } else {
-          // console.log('麦克风静音');
-          if (isRecognizing) {
-            recognition.stop();
-            isRecognizing = false;
-          }
-        }
-        requestAnimationFrame(draw);q
+         analyser.getByteFrequencyData(dataArray);
+         const max = Math.max(...dataArray);
+         console.log(max)
+         if (max > 100) {
+            console.log('麦克风有声音');
+         } else {
+            console.log('麦克风静音');
+         }
+         requestAnimationFrame(draw);
       };
       draw();
     })
-    .catch(error => {
-      console.error('获取麦克风权限失败:', error);
+   .catch(error => {
+      console.error("获取麦克风权限失败:", error);
     });
 } 
 </script>

@@ -25,16 +25,19 @@
               <div class="baoshi-box">
                 <a-space>
                   <a-switch @change="handleAutoStart" /> 自动报时
-                  <icon-right />
+                  <a-divider direction="vertical" />
                   <a-switch @change="handleBell" /> 开启铃铛
                 </a-space>
               </div>
               <div class="ws-box">
                 <a-space>
                   <a-switch @change="handleConnentDanMu" checked-color="#00B42A" /> 连接弹幕服务
-                  <icon-right />
+                  <a-divider direction="vertical" />
                   直播间人数
                   <a-link :hoverable="false">{{ currentCount }}</a-link>
+                  <a-divider direction="vertical" />
+                  累计观看人数
+                  <a-link :hoverable="false"> {{ totalViewersCount }}</a-link>
                 </a-space>
               </div>
             </a-space>
@@ -55,11 +58,13 @@
                          <outputDevice/>
                          <a-divider orientation="left">调音器</a-divider>
                          <outputIndex/>
-                         <a-divider orientation="left">Other</a-divider>
+                         <a-divider orientation="left"></a-divider>
                          <managementmodel v-model="selectedModels" />
                     </a-col>
                     <a-col :span="14">
-                      <a-card title="弹幕" style="margin:20px 0;height: 58vh;"></a-card>
+                      <a-card title="互动消息" style="margin:20px 0;height: 58vh;">
+                        <comment v-model="selectedModels" :commentList="hudongList" />
+                      </a-card>
                     </a-col>
                   </a-row>
             </a-col>
@@ -106,6 +111,7 @@ import {
   onMounted,
   defineAsyncComponent,
   markRaw,
+  onBeforeUnmount
 } from "vue";
 import { Message } from "@arco-design/web-vue";
 import { useSocket } from "@/compositions/useSocket.js";
@@ -172,7 +178,7 @@ const { category_id = 1, category_name = "默认直播间" } = params.query;
 document.title = category_name;
 const timeRange = ref([70, 90]);
 const selectedModels = ref({});
-const { connectWebSocket, disconnectWebSocket, hudongList, currentCount } =
+const { connectWebSocket, disconnectWebSocket, hudongList, currentCount, totalViewersCount,giftList} =
   useSocket();
 const { fetchSpeech } = useForWithDelay();
 const { startPeriodicExecution, stopPeriodicExecution } =
@@ -369,8 +375,21 @@ let unsetSinkId
 //启动服务
 import {useChildProcess} from  '@/compositions/useChildProcess'
 // 开启、关闭http服务
-const {startHttpServer,checkServerStatus} = useChildProcess()
+const {startHttpServer,checkServerStatus,stopHttpServer} = useChildProcess()
+const handleCheck=async()=>{
+  const is_running = await checkServerStatus()
+  console.log(is_running)
+}
+const handleStopAI=async()=>{
+  await stopHttpServer()
+}
 const startAIService=async (e)=>{
+    const is_running = await checkServerStatus()
+    if(is_running){
+        // Message.info('正在关闭 AI 服务')
+        emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'AI 服务已经启动，无需启动'})
+        return false
+    }
     emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'正在启动 AI 服务'})
     try {
         await startHttpServer()
@@ -396,12 +415,16 @@ onMounted(()=>{
   startAIService()
   if(import.meta.env.DEV){}
 });
+onBeforeUnmount(async()=>{
+  await stopHttpServer()
+})
 onUnmounted(() => {
   audioList.value?.destroy();
   if (unlisten) unlisten();
   if (unrefreshTimeAnnouncementList) unrefreshTimeAnnouncementList();
   if (unanchorVolume) unanchorVolume()
   if (unsetSinkId) unsetSinkId()
+  
 });
 </script>
 

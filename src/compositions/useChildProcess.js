@@ -4,6 +4,7 @@ export function useChildProcess() {
     const windows = navigator.userAgent.includes("Windows");
     let cmd = windows ? "cmd" : "sh";
     let args = windows ? ["/C"] : ["-c"];
+    let serverProcess = null; // 存储进程句柄
 
     const startHttpServer = async () => {
         const command = new Command(cmd, [
@@ -32,9 +33,8 @@ export function useChildProcess() {
         });
 
         try {
-            const childProcess = await command.spawn(); // 使用 spawn 而不是 execute
-            
-            console.log(childProcess)
+            serverProcess = await command.spawn(); // 使用 spawn 而不是 execute
+            console.log(serverProcess)
             return true
         } catch (error) {
             console.error('启动失败，详细信息:', {
@@ -55,6 +55,9 @@ export function useChildProcess() {
             ]);
 
             const result = await findCommand.execute();
+            if(serverProcess){
+                await serverProcess.kill();
+            }
             console.log('查找结果:', result);
             if (result.stdout) {
                 const lines = result.stdout.split('\n');
@@ -112,6 +115,14 @@ export function useChildProcess() {
             if(result.stdout) {
                 return true
             }
+          //   if (serverProcess) {
+          //     // 检查进程是否仍在运行
+          //     const pid = serverProcess.pid;
+          //     if (!pid) return false;
+              
+          //     // 检查进程状态
+          //     return !serverProcess.killed;
+          // }
             return false
             console.log('查找结果:', result);
         } catch (error) {
@@ -120,6 +131,7 @@ export function useChildProcess() {
                 错误名称: error.name,
                 完整错误: error
             });
+            return false
         }
     }
     return {

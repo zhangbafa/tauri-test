@@ -13,6 +13,7 @@ export function useSocket(maxListSize = 20) {
   const giftList = ref([]);
   const hudongList = ref([]);
   const currentCount = ref(0);
+  const totalViewersCount = ref(0)
   // 消息缓存队列
   const messageQueue = ref([]);
   // 创建一个防抖函数，每1秒更新一次，但不丢失消息
@@ -80,7 +81,7 @@ export function useSocket(maxListSize = 20) {
       // 1[普通弹幕]，2[点赞消息]，3[进入直播间]，4[关注消息]，5[礼物消息]，6[统计消息]，7[粉丝团消息]，8[直播间分享]，9[下播]
       switch (originalMsg.Type) {
         case 1: // 普通弹幕
-          if (message.User?.Id !== 76024962349) {
+          if (message.User?.Nickname !== '国货之光') {
             newMessage= {
               type: 1,
               msgId: message.MsgId,             
@@ -99,8 +100,8 @@ export function useSocket(maxListSize = 20) {
             nickName: message.User?.Nickname ?? '',
             avatar: message.User?.HeadImgUrl ?? favicon,
             secUid: message.User?.SecUid,
-            // count:message.Count,
-            // total:message.Total
+            count:message.Count,
+            total:message.Total
           }
           break;  
         case 3: // 进入直播间消息
@@ -137,51 +138,11 @@ export function useSocket(maxListSize = 20) {
           }
           break
         case 6: // 统计消息
-        // "OnlineUserCount\":2,\"TotalUserCount 
-          // newMessage= {
-          //   type: 6,
-          //   msgId: message.MsgId, 
-          //   onlineUserCount:message.OnlineUserCount,
-          //   totalUserCount:message.totalUserCount            
-          // }
-          // currentCount.value = message.OnlineUserCount;
+        totalViewersCount.value = message.TotalUserCountStr;
         default:
           break;
           // console.log('未知消息类型');
         }
-        // console.log(newMessage)
-      // if (message.CurrentCount) {
-      //   currentCount.value = message.CurrentCount;
-      //   newMessage={
-      //     type: 'enter',
-      //     msgId: message.MsgId,
-      //     nickName: message.User?.Nickname,
-      //     avatar: message.User?.HeadImgUrl??favicon,
-      //     content: '',
-      //     secUid: message.User?.SecUid
-      //   };
-      // } else if (message.GiftId) { // 礼物消息
-      //   newMessage= {
-      //     type: 'gift',
-      //     msgId: message.MsgId,
-      //     giftName: message.GiftName,
-      //     avatar: message.ImgUrl,
-      //     nickName: message.User.Nickname,
-      //     content: message.Content,
-      //     secUid: message.User?.SecUid
-      //   }
-      // } else {
-      //   if (message.User?.Id !== 76024962349) {
-      //     newMessage= {
-      //       type: message.CurrentCount === 0 ? 'enter' : 'comment',
-      //       msgId: message.MsgId,
-      //       content: message.CurrentCount === 0 ? '' : message.Content,
-      //       nickName: message.User?.Nickname ?? '',
-      //       avatar: message.User?.HeadImgUrl ?? favicon,
-      //       secUid: message.User?.SecUid
-      //     }
-      //   }
-      // }
 
       // 如果有新消息，添加到消息队列
       if (newMessage) {
@@ -260,6 +221,7 @@ export function useSocket(maxListSize = 20) {
     msgList,
     giftList,
     hudongList,
-    currentCount
+    currentCount,
+    totalViewersCount
   };
 }
