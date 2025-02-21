@@ -4,8 +4,7 @@
 
 <script setup lang="js">  
 import { onMounted } from 'vue';
-
-onMounted(() => {
+onMounted(async() => {
   document.getElementById('loadingPage').remove()
 });
 </script>

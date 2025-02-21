@@ -90,6 +90,7 @@ export function useSocket(maxListSize = 20) {
               content: message.Content,
               secUid: message.User?.SecUid
             }
+            // 将用户的评论保存到数据库或者文件中
           }          
           break;
         case 2: // 点赞消息

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <audio src="blob:http://localhost:1420/594b8c3b-95d4-4f65-8574-b5c7fc87054e"  controls/>
     <a-tabs default-active-key="1" type="card-gutter">
       <a-tab-pane key="1">
         <template #title> <icon-home /> 主控台 </template>
@@ -98,6 +99,7 @@ import { useForWithDelay } from "@/compositions/useForWithDelay.js";
 import { useInterval } from "@/compositions/useInterval.js";
 import { useAudioPlayer } from "@/compositions/useAudioPlayer.js";
 import { replayText, shortText } from "@/data/shortText.js";
+import { fileUtils } from '@/utils/fileUtils';
 // 异步加载组件
 const speechservice = defineAsyncComponent(() =>
   import("@/components/speechservice/index.vue")
@@ -150,9 +152,8 @@ import {setTimeParseTime} from '@/utils/index.js'
 import { useRoute } from "vue-router";
 import { listen,emit } from "@tauri-apps/api/event";
 import { processTemplate } from '@/utils/index.js'
-
-
 const params = useRoute();
+console.log(params.query)
 const { category_id = 1, category_name = "未命名直播间" } = params.query;
 document.title = category_name;
 const timeRange = ref([70, 90]);
@@ -341,8 +342,30 @@ onUnmounted(() => {
   if(unrefreshTimeAnnouncementList) unrefreshTimeAnnouncementList();
 });
 
+const saveToFile = async (content) => {
+  try {
+    await fileUtils.writeToFile(
+      'example.txt',
+      content,
+      'data'
+    );
+    Message.success('文件保存成功');
+  } catch (error) {
+    Message.error('文件保存失败');
+  }
+};
 
-
+const readFile = async () => {
+  try {
+    const content = await fileUtils.readFromFile(
+      'example.txt',
+      'data'
+    );
+    return content;
+  } catch (error) {
+    Message.error('文件读取失败');
+  }
+};
 </script>
 
 <style>
