@@ -14,11 +14,15 @@ export function useWindow() {
                 center: true,
                 transparent: true,
                 decorations: true,
-                alwaysOnTop: false,
+                alwaysOnTop: true,
+                minimizable: false,
+                maximizable: false,
+                skipTaskbar: false,
                 resizable: false,
                 fullscreen: false,
                 dragDropEnabled: true,
                 backgroundColor: '#000000',
+            
             };
 
             webview = new WebviewWindow(label, {

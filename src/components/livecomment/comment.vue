@@ -17,7 +17,7 @@
                         </span>
                         <span v-show="item.type == 5">送出了 {{ item.giftName }}</span>
                         <span v-show="item.type == 3">进入直播间</span>
-                        <span v-show="item.type == 2">点赞:{{ item.count }},共点赞:{{ item.total }}</span>
+                        <span v-show="item.type == 2">点赞:{{ item.count }}个,直播间共有{{ item.total }}个点赞</span>
                         <template #actions>
                             <icon-play-circle-fill size="22" @click="handlePlayHudong(item)" />
                         </template>

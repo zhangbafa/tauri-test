@@ -10,6 +10,7 @@ node_modules
 dist
 .history
 dist-ssr
+src-
 *.local
 ~
 # Editor directories and files

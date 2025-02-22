@@ -51,7 +51,7 @@
   <script>
   import { defineComponent, ref } from 'vue';
   import {RouterLink,useRoute} from 'vue-router'
-  import { Message } from '@arco-design/web-vue';
+  import { Message } from '@arco-design/web-vue'; 
   import {
     IconCaretRight,
     IconCaretLeft,
@@ -117,7 +117,12 @@
     line-height: 48px;
   }
   .layout-demo :deep(.arco-layout-content) {
-    background: var(--color-bg-3); 
+    /* background: var(--color-bg-3);  */
+    background-image: linear-gradient(
+    -165deg, 
+    #FFECE8,
+    #ffffff 20%
+  );
   }
   .layout-demo :deep(.arco-layout-footer) {
     display: flex;

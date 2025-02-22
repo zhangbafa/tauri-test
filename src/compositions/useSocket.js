@@ -2,18 +2,23 @@ import { ref, onUnmounted, onMounted } from 'vue';
 import { Message } from '@arco-design/web-vue';
 import { debounce } from 'lodash-es';
 import favicon from '@/assets/favicon.png'
-export function useSocket(maxListSize = 20) {
+import {useFS} from '@/compositions/useFS.js'
+const {writeText} = useFS() 
 
+export function useSocket(maxListSize = 20) {
   let socket;
   let reconnectInterval = 5000;  // 重连间隔，单位：毫秒
   let heartbeatInterval = 30000;  // 心跳间隔，单位：毫秒
   let heartbeatTimer;
   let reconnectTimer;
-  const msgList = ref([]);
-  const giftList = ref([]);
-  const hudongList = ref([]);
-  const currentCount = ref(0);
+  const msgList           = ref([]);
+  const giftList          = ref([]);
+  const hudongList        = ref([]);
+  const currentCount      = ref(0);
   const totalViewersCount = ref(0)
+  // 保存评论
+  const saveComment       = ref(false)
+  const filename          = ref()
   // 消息缓存队列
   const messageQueue = ref([]);
   // 创建一个防抖函数，每1秒更新一次，但不丢失消息
@@ -67,7 +72,7 @@ export function useSocket(maxListSize = 20) {
 
     socket.addEventListener('open', function (event) {
       console.log('WebSocket 连接已建立');
-      Message.info('WebSocket 连接已建立');
+      Message.info('弹幕服务连接成功');
       startHeartbeat();
       socket.send('Hello, Server!');
     });
@@ -90,7 +95,13 @@ export function useSocket(maxListSize = 20) {
               content: message.Content,
               secUid: message.User?.SecUid
             }
-            // 将用户的评论保存到数据库或者文件中
+            if(saveComment.value){              
+              writeText(filename.value,`${newMessage.nickName}::${newMessage.content}\r\n`)
+              console.log('保存评论')
+            }else{
+              console.log('不保存评论')
+            }
+            
           }          
           break;
         case 2: // 点赞消息
@@ -205,6 +216,11 @@ export function useSocket(maxListSize = 20) {
     }
   }
 
+  function setSaveComment(filenamestr,value){
+    filename.value = filenamestr
+    saveComment.value = value
+  }
+
   // 使用 Vue 生命周期钩子清理资源
   onUnmounted(() => {
     disconnectWebSocket();
@@ -223,6 +239,7 @@ export function useSocket(maxListSize = 20) {
     giftList,
     hudongList,
     currentCount,
-    totalViewersCount
+    totalViewersCount,
+    setSaveComment
   };
 }

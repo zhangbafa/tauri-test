@@ -3,14 +3,14 @@
     <div class="app-name">
       <!-- <h1 style="text-align: left;">选择你的直播间</h1> -->
     </div>
-  <div>
+  <div style="width: 70%;margin: 0 auto;">
         <a-row :gutter="20">
           <a-col :span="12" v-for="item in category" :key="item.id" style="margin-bottom: 15px;cursor: pointer;">
             <a-card hoverable @click="handleNav(item)">
               <a-dropdown trigger="contextMenu" alignPoint :style="{display:'block'}">
-              <div  style="display: flex;justify-content: space-between;width: 100%;padding: 10px;align-items: center;">
-                <div @focus="handleFocus" style="font-weight: bold;width: 80%;padding: 6px;">{{ item.category_name }}</div>
-                <div>
+              <div  style="display: flex;justify-content: space-between;width: 100%;padding: 15px 10px;align-items: center;">
+                <div @focus="handleFocus" style="font-weight: bold;width: 80%;padding: 6px;font-size: 16px;">{{ item.category_name }}</div>
+                <div style="font-size:18px;margin-right: 15px;">
                   <icon-right />
                 </div>
               </div>
@@ -216,13 +216,16 @@ const initializeData = async () => {
 
 <style scoped>
 .container {
-  width: 70%;
-  height: 98vh;
+  height: 100vh;
   margin: 0 auto;
   display: flex;
-  /* align-items: center; */
   justify-content: center;
   flex-direction: column;
+  background-image: linear-gradient(
+    180deg, 
+    #FFECE8,
+    #ffffff 20%
+  );
 }
 .app-name {
   text-align: left;
@@ -234,5 +237,11 @@ const initializeData = async () => {
   /* text-align: center; */
   width: 80px;
   height: auto;
+}
+h1{
+  color: red;
+}
+:deep(.arco-card){
+  border-radius: 10px;
 }
 </style>
