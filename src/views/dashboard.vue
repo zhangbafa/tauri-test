@@ -20,7 +20,7 @@
                   主播AI{{ enableAnchor ? "开启" : "关闭" }}
                 </a-space>
               </div>
-              <AssistantAI @update-bell-volume="handleUpdateBellVolume" @update-baoshi-volume="handleUpdateBaoshiVolume"/>
+              <AssistantAI @update-bell-volume="handleUpdateBellVolume" @update-baoshi-volume="handleUpdateBaoshiVolume" :liveid="category_id"/>
               <div class="baoshi-box">
                 <a-space>
                   <a-switch @change="handleAutoStart" /> 自动报时

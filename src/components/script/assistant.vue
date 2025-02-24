@@ -15,7 +15,8 @@
                 </a-popconfirm>
             </template>
             <div style="margin: 0 auto; width:100%;position: relative;">
-              <a-textarea v-model="item.content" placeholder="请输入主播话术" :max-length="150" :auto-size="{maxRows:5,minRows:2}" allow-clear
+              <a-input type="text" v-model="item.keyword" placeholder=" 请输入回复关键词" />
+              <a-textarea v-model="item.content" placeholder="请输入回复话术，可使用变量" :max-length="150" :auto-size="{maxRows:5,minRows:2}" allow-clear
              @focus="handleFocus(item.id)"
                 show-word-limit />
             </div>
@@ -130,11 +131,12 @@ const handleDelete = async (item) => {
 };
 
 const handleEdit = async (item) => {
+  console.log(`UPDATE assistant_script SET content = ${item.content} and keyword = ${item.keyword} WHERE id = ${item.id}`)
   try {
     if(item?.id){
       await dbManager.execute(
-        "UPDATE assistant_script SET content = ? WHERE id = ?",
-        [item.content, item.id]
+        "UPDATE assistant_script SET content = ?,keyword = ? WHERE id = ?",
+        [item.content,item.keyword, item.id]
       );
     }else{
       await dbManager.insert("assistant_script", item);
