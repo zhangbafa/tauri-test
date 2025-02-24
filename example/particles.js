@@ -31,7 +31,7 @@ class Particle {
         this.speedY = Math.random() * 3 - 1.5;
         // this.color = `rgba(255, 255, 255, ${Math.random()})`;
         // this.color = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.8)`;  
-        this.color = `rgba(${this.x / canvas.width * 255}, ${this.y / canvas.height * 255}, 150, 1)`;
+        this.color = `rgba(${this.x / canvas.width * 255}, ${this.y / canvas.height * 255}, 150, 0.01)`;
 
     }
 

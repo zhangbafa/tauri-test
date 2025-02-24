@@ -15,7 +15,9 @@
         <a-button @click="handlePause" type="primary" status="danger" style="margin-right: 10px;">
           暂停
         </a-button>
-      </a-space><a-divider direction="vertical" />
+        <a-slider :default-value="0.5" :min="0" :max="1" :step="0.01" show-ticks :style="{ width: '300px' }" show-input @change="handleSetVolume"/>
+      </a-space>
+      <a-divider direction="vertical" />
       <div v-if="audioDevices.length > 0" style="margin-right: auto">
         <a-select v-model="selectedDevice" style="width: 200px" @change="handleDeviceChange">
           <a-option v-for="device in audioDevices" :key="device.deviceId" :value="device.deviceId">
@@ -62,9 +64,13 @@ const audioDevices = ref([])
 const selectedDevice = ref('')
 
 audioPlayer.value.loop = enableLoop.value
-
+ 
 const isPlaying = ref(false)
 
+const handleSetVolume=(e)=>{
+  console.log(e)
+  audioPlayer.value.volume = e
+}
 const handlePlay = async () => {
   try {
     await audioPlayer.value.play()
@@ -195,7 +201,7 @@ const loadAudioDevices = async () => {
 const handleDeviceChange = async (deviceId) => {
   try {
     await audioPlayer.value.setSinkId(deviceId)
-    Message.success('音频输出设备切换成功')
+    // Message.success('音频输出设备切换成功')
   } catch (error) {
     console.error('切换音频输出设备失败:', error)
     Message.error('切换音频输出设备失败：' + error.message)

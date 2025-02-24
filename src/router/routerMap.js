@@ -92,48 +92,7 @@ const constantRouterMap = [
         },
       },
     ],
-  },
-  // {
-  //   path: "/",
-  //   name: "Assistant",
-  //   redirect:'/assistant',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: "/assistant",
-  //       name: "AssistantIndex",
-  //       component: () => import("@/views/assistant/index.vue"),
-  //     },
-  //     {
-  //       path: "/assistant/create",
-  //       name: "AssistantCreate",
-  //       component: () => import("@/views/assistant/create.vue"),
-  //     },
-  //     {
-  //       path: "/assistant/voicetimbre",
-  //       name: "AssistantVoiceTimbre",
-  //       component: () => import("@/views/assistant/voicetimbre.vue"),
-  //     },
-  //     {
-  //       path: "/assistant/setting",
-  //       name: "AssistantSetting",
-  //       component: () => import("@/views/assistant/setting.vue"),
-  //     },
-      
-  //   ]
-  // },
-  // {
-  //   path: "/lab",
-  //   name: "Lab",
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: "/lab",
-  //       name: "ShopIndex",
-  //       component: () => import("@/views/lab/deekseep.vue"),
-  //     },
-  //   ],
-  // }
+  }
 ];
 
 export default constantRouterMap;

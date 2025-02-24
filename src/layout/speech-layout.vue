@@ -35,14 +35,12 @@
       </a-layout-sider>
       <a-layout>
         <a-layout>
-          <a-layout-content :style="{padding: '10px 16px'}">
-            <transition>
+          <a-layout-content :style="{padding: '10px 16px'}">            
             <router-view v-slot="{ Component, route }">
-             
+              <transition>
                 <component :is="Component" :key="route.fullPath" />
-              
-            </router-view>
-          </transition>
+              </transition>
+            </router-view>          
           </a-layout-content>
         </a-layout>
       </a-layout>

@@ -102,6 +102,10 @@ class LoopAudio {
         }
     }
 
+    setVolume(value){
+        this.audio.volume = value
+    }
+
     setSinkId(value){
         this.deviceId = value
     }

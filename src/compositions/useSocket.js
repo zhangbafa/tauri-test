@@ -1,4 +1,5 @@
 import { ref, onUnmounted, onMounted } from 'vue';
+import { emit } from '@tauri-apps/api/event'
 import { Message } from '@arco-design/web-vue';
 import { debounce } from 'lodash-es';
 import favicon from '@/assets/favicon.png'
@@ -95,12 +96,15 @@ export function useSocket(maxListSize = 20) {
               content: message.Content,
               secUid: message.User?.SecUid
             }
+
+            // 保存直播间互动消息
             if(saveComment.value){              
               writeText(filename.value,`${newMessage.nickName}::${newMessage.content}\r\n`)
-              console.log('保存评论')
-            }else{
-              console.log('不保存评论')
             }
+
+            // 将互动消息推送给互动模块
+            emit('assistantInteraction',{content:newMessage.content})
+            
             
           }          
           break;

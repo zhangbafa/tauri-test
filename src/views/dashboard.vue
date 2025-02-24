@@ -3,7 +3,7 @@
     <div style="position: absolute;top:0;right:0;z-index: 10;margin-top: 4px;">
       <a-space>
         <a-link :hoverable="false" style="margin-left: 10px;font-size: 12px;" href="/"><icon-left /> {{ category_name
-          }}</a-link>
+        }}</a-link>
         <span style="font-size:12px">软件有效期至: 2025-10-10</span>
       </a-space>
     </div>
@@ -12,7 +12,7 @@
         <template #title> <icon-home /> 主控台 </template>
         <div style="padding: 20px 10px">
 
-          <div style="display: flex; justify-content: space-between;background-color: #fff;padding: 10px">
+          <div style="display: flex; justify-content: space-between;padding: 10px">
             <a-space>
               <div class="baoshi-box">
                 <a-space>
@@ -20,6 +20,7 @@
                   主播AI{{ enableAnchor ? "开启" : "关闭" }}
                 </a-space>
               </div>
+              <AssistantAI @update-bell-volume="handleUpdateBellVolume" @update-baoshi-volume="handleUpdateBaoshiVolume"/>
               <div class="baoshi-box">
                 <a-space>
                   <a-switch @change="handleAutoStart" /> 自动报时
@@ -46,32 +47,35 @@
           <a-row>
             <a-col :span="24">
               <a-row :gutter="20">
-                    <a-col :span="10">
-                        <a-divider orientation="left">插入播报</a-divider>               
-                         <ManualBroadcast v-model="selectedModels" />
-                         <a-divider orientation="left">选择设备</a-divider>   
-                         <outputDevice/>
-                         <a-divider orientation="left">调音器</a-divider>
-                         <outputIndex/>
-                         <a-divider orientation="left"></a-divider>
-                         <managementmodel v-model="selectedModels" />
-                    </a-col>
-                    <a-col :span="14">
-                      <a-card title="互动消息" style="margin:20px 0;height: 58vh;">
-                        <template #extra>
-                          <a-space>
-                             <a-checkbox>礼物</a-checkbox>
-                             <a-checkbox>点赞</a-checkbox>
-                             <a-checkbox>进入直播间</a-checkbox>
-                             <a-divider direction="vertical" />
-                             <a-checkbox v-model="savelivecomment" @change="handleSaveLiveComment">保存评论</a-checkbox>
-                             <a-link @click="handleOpenCommentTXT">打开文件</a-link>
-                          </a-space>
-                        </template>
-                        <comment v-model="selectedModels" :commentList="hudongList" />
-                      </a-card>
-                    </a-col>
-                  </a-row>
+                <a-col :span="10">
+                  <a-divider orientation="left">插入播报</a-divider>
+                  <ManualBroadcast v-model="selectedModels" />
+                  <a-divider orientation="left">选择设备</a-divider>
+                  <outputDevice />
+                  <a-divider orientation="left">调音器</a-divider>
+                  <outputIndex />
+                  <a-divider orientation="left"></a-divider>
+                  <a-space>
+                    <managementmodel v-model="selectedModels" />
+                    <rotationReportModel v-model="selectedModels"/>
+                  </a-space>
+                </a-col>
+                <a-col :span="14">
+                  <a-card title="互动消息" style="margin:20px 0;height: 58vh;">
+                    <template #extra>
+                      <a-space>
+                        <a-checkbox>礼物</a-checkbox>
+                        <a-checkbox>点赞</a-checkbox>
+                        <a-checkbox>进入直播间</a-checkbox>
+                        <a-divider direction="vertical" />
+                        <a-checkbox v-model="savelivecomment" @change="handleSaveLiveComment">保存评论</a-checkbox>
+                        <a-link @click="handleOpenCommentTXT">打开文件</a-link>
+                      </a-space>
+                    </template>
+                    <comment v-model="selectedModels" :commentList="hudongList" />
+                  </a-card>
+                </a-col>
+              </a-row>
             </a-col>
             <a-col :span="24">
               <Log />
@@ -148,6 +152,9 @@ const Anchor = defineAsyncComponent(() =>
 const Assistant = defineAsyncComponent(() =>
   import("@/components/script/assistant.vue")
 );
+const AssistantAI = defineAsyncComponent(() =>
+  import("@/components/assistant.vue")
+);
 const interrupt = defineAsyncComponent(() =>
   import("@/components/script/interrupt.vue")
 );
@@ -169,6 +176,7 @@ const setting = defineAsyncComponent(() =>
 const smartscene = defineAsyncComponent(() =>
   import("@/components/smartscene/index.vue")
 );
+const rotationReportModel = defineAsyncComponent(() => import("@/components/rotation/reportmodel.vue"))
 import { useRandomPicker } from "@/compositions/useRandomPicker";
 import AudioPlaylist from "@/compositions/playlist";
 import dbManager from "@/db/index.js";
@@ -182,8 +190,8 @@ const params = useRoute();
 const { category_id = 1, category_name = "默认直播间" } = params.query;
 document.title = category_name;
 const timeRange = ref([70, 90]);
-const selectedModels = ref({});
-const { connectWebSocket, disconnectWebSocket, hudongList, currentCount, totalViewersCount,giftList,setSaveComment} =
+const selectedModels = ref({anchor_model: '0', assistant_model: '0', report_model: '1'});
+const { connectWebSocket, disconnectWebSocket, hudongList, currentCount, totalViewersCount, giftList, setSaveComment } =
   useSocket();
 const { fetchSpeech } = useForWithDelay();
 const { startPeriodicExecution, stopPeriodicExecution } =
@@ -227,8 +235,7 @@ const handleAutoStart = async (e) => {
       const tempText = processTemplate(temp.content)
       const text = `${setTimeParseTime()},${totalUserCount}${tempText}`;
       //添加变量
-      emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: '报时：' + text })
-
+      emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: '报时：' + text })      
       const audioBlob = await fetchSpeech(
         text,
         selectedModels.value.report_model
@@ -259,7 +266,16 @@ const handleBell = async (e) => {
 const handleTimeRangeUpdate = (range, volume, playbackRate) => {
   bellAudio.updateTimeRange(range, volume, playbackRate);
 };
-// 更新报时语速
+// 修改铃铛的音量
+const handleUpdateBellVolume=(volume)=>{
+  bellAudio.setVolume(volume)
+}
+
+// 修改报时音量
+const handleUpdateBaoshiVolume=(volume)=>{
+  setVolume(volume);
+}
+// 更新报时语速、音量
 const handleTimeSpeakerRangeUpdate = (
   range,
   volume,
@@ -378,50 +394,50 @@ let unsetSinkId
 })()
 
 //启动服务
-import {useChildProcess} from  '@/compositions/useChildProcess'
+import { useChildProcess } from '@/compositions/useChildProcess'
 // 开启、关闭http服务
-const {startHttpServer,checkServerStatus,stopHttpServer} = useChildProcess()
-const handleCheck=async()=>{
+const { startHttpServer, checkServerStatus, stopHttpServer } = useChildProcess()
+const handleCheck = async () => {
   const is_running = await checkServerStatus()
   console.log(is_running)
 }
-const handleStopAI=async()=>{
+const handleStopAI = async () => {
   await stopHttpServer()
 }
-const startAIService=async (e)=>{
-    const is_running = await checkServerStatus()
-    if(is_running){
-        // Message.info('正在关闭 AI 服务')
-        emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'AI 服务已经启动，无需启动'})
-        return false
-    }
-    emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'正在启动 AI 服务'})
-    try {
-        await startHttpServer()
-        let timer = null
-        timer = setInterval(async () => {
-            const result = await checkServerStatus()
-            if(result){
-                clearInterval(timer)
-                Message.info('启动成功')
-                emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'AI 服务启动成功'})
-                return true
-            }
-        },1000)
-      
-    } catch (error) {
-        Message.info('服务启动失败')
-        emit('addLog',{time:new Date().toLocaleString(),role:'系统',logtext:'AI 服务启动失败'})
-    }
+const startAIService = async (e) => {
+  const is_running = await checkServerStatus()
+  if (is_running) {
+    // Message.info('正在关闭 AI 服务')
+    emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: 'AI 服务已经启动，无需启动' })
+    return false
+  }
+  emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: '正在启动 AI 服务' })
+  try {
+    await startHttpServer()
+    let timer = null
+    timer = setInterval(async () => {
+      const result = await checkServerStatus()
+      if (result) {
+        clearInterval(timer)
+        Message.info('启动成功')
+        emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: 'AI 服务启动成功' })
+        return true
+      }
+    }, 1000)
+
+  } catch (error) {
+    Message.info('服务启动失败')
+    emit('addLog', { time: new Date().toLocaleString(), role: '系统', logtext: 'AI 服务启动失败' })
+  }
 }
 // 组件挂载时自动初始化
-onMounted(()=>{
+onMounted(() => {
   initializeAudioPlaylist()
   // startAIService()
-  if(import.meta.env.DEV){}
+  if (import.meta.env.DEV) { }
 });
-onBeforeUnmount(async()=>{
-  await stopHttpServer()
+onBeforeUnmount(async () => {
+  // await stopHttpServer()
 })
 onUnmounted(() => {
   audioList.value?.destroy();
@@ -429,25 +445,25 @@ onUnmounted(() => {
   if (unrefreshTimeAnnouncementList) unrefreshTimeAnnouncementList();
   if (unanchorVolume) unanchorVolume()
   if (unsetSinkId) unsetSinkId()
-  
+
 });
 
 // 保存评论
 const savelivecomment = ref(false)
 // openDirectory
-import {useFS} from '@/compositions/useFS.js'
-const {openDirectory,createIfNotExists,generateDateTimeFilename} = useFS()
+import { useFS } from '@/compositions/useFS.js'
+const { openDirectory, createIfNotExists, generateDateTimeFilename } = useFS()
 let commentFilename;
-const handleSaveLiveComment=async(e)=>{
-    commentFilename = generateDateTimeFilename()
-    await createIfNotExists(category_name)
-    setSaveComment(`${category_name}/${commentFilename}`,e)
+const handleSaveLiveComment = async (e) => {
+  commentFilename = generateDateTimeFilename()
+  await createIfNotExists(category_name)
+  setSaveComment(`${category_name}/${commentFilename}`, e)
 }
 
 
-const handleOpenCommentTXT= async () =>{
-  const result = await openDirectory(category_name,`${commentFilename}`)
-  if(!result) Message.error('打开错误')
+const handleOpenCommentTXT = async () => {
+  const result = await openDirectory(category_name, `${commentFilename}`)
+  if (!result) Message.error('打开错误')
 }
 </script>
 

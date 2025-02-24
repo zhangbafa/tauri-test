@@ -6,7 +6,8 @@ export function useAudioPlayer() {
   const playbackRate = ref(1.0); // 播放速度（默认1.0）
   const deviceId = ref('')
   const audioContext = new (window.AudioContext || window.webkitAudioContext)()  
- 
+  const currentGainNode = ref(null) // 新增当前增益节点引用
+
   const playBlob = async (blob) => {
     try {
       // console.log(`音量，语速：${volume.value,playbackRate.value}`)
@@ -23,7 +24,7 @@ export function useAudioPlayer() {
        // 创建增益节点控制音量
        const gainNode = audioContext.createGain()
        gainNode.gain.value = volume.value
-       
+       currentGainNode.value = gainNode // 存储当前增益节点
        // 连接音频处理链：source -> gainNode -> destination
        source.connect(gainNode)
        gainNode.connect(audioContext.destination)
@@ -31,6 +32,7 @@ export function useAudioPlayer() {
       // 播放完成后自动断开连接和销毁
       source.onended = () => {
         console.log('播放完毕')
+        currentGainNode.value = null // 清除引用
         playing.value = true
         source.disconnect()
         source.buffer = null // 帮助垃圾回收
@@ -60,9 +62,22 @@ export function useAudioPlayer() {
   }
 
   // 添加设置音量的方法
-  const setVolume = (value) => {
+  const setVolume2 = (value) => {
     volume.value = value // 确保音量在 0-1 之间
   }
+
+  const setVolume = (value) => {  
+    console.log('baoshi:'+value)  
+    if (currentGainNode.value) {
+      // 使用指数曲线更符合人类听觉感知
+      currentGainNode.value.gain.setTargetAtTime(
+        value,
+        audioContext.currentTime,
+        0.01
+      )
+    }
+  }
+
 
   // 设置播放速度
   const setPlaybackRate = (value) => {

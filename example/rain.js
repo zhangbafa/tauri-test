@@ -5,7 +5,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 const rainDrops = [];
-const numberOfRainDrops = 500;
+const numberOfRainDrops = 5000;
 
 // 调整雨滴数量
 const adjustRainDrops = () => {
@@ -36,17 +36,17 @@ class RainDrop {
 
         // 雨滴移出画布时重置
         if (this.y > canvas.height) {
-            this.y = Math.random() * -50; // 从画布顶部重新开始
+            this.y = Math.random() * - 50; // 从画布顶部重新开始
             this.x = Math.random() * canvas.width;
             this.length = Math.random() * 20 + 10;
             this.speed = Math.random() * 4 + 2;
-            this.opacity = Math.random() * 0.5 + 0.2;
+            this.opacity = 0.5;
         }
     }
 
     draw() {
         ctx.strokeStyle = `rgba(174, 194, 224, ${this.opacity})`; // 雨滴颜色
-        ctx.lineWidth = 10; // 雨滴宽度
+        ctx.lineWidth = 1; // 雨滴宽度
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
         ctx.lineTo(this.x, this.y + this.length);

@@ -44,8 +44,8 @@ import { Notification } from '@arco-design/web-vue';
 const emit = defineEmits(['update-timespeaker-range']);
 const show = ref(false)
 const form = reactive({
-  min: '55',
-  max: '60',
+  min: '30',
+  max: '40',
   volume: '1',
   playbackRate: '1',
   totalUserCount:'0'

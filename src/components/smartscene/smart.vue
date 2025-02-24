@@ -1,9 +1,9 @@
 <template>
   <a-watermark :content="watermark">
-  <div class="container">
-    <canvas id="canvas"></canvas>
-  </div>
-</a-watermark>
+    <div class="container">
+      <canvas id="canvas"></canvas>
+    </div>
+  </a-watermark>
 </template>
 
 <script setup>
@@ -17,7 +17,6 @@ listen("show-marks", () => {
   showmarks.value = !showmarks.value;
 });
 
-
 let video;
 let canvas;
 let ctx;
@@ -29,7 +28,7 @@ const form = reactive({
   post: "",
   isRead: false,
 });
-const watermark=ref('畅语智景,视频正在加载中...')
+const watermark = ref('畅语智景,视频正在加载中...');
 
 // 图片相关变量
 const img = new Image();
@@ -45,10 +44,64 @@ let startImgX;
 let startImgY;
 let shouldDrawImage = true;
 
+// 雨滴相关变量
+const rainDrops = [];
+const numberOfRainDrops = ref(500);
+
+// 调整雨滴数量
+const adjustRainDrops = () => {
+  rainDrops.length = 0;
+  for (let i = 0; i < numberOfRainDrops.value; i++) {
+    rainDrops.push(new RainDrop());
+  }
+};
+
 // 更新画布大小
 const updateCanvasSize = () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  adjustRainDrops();
+};
+
+// RainDrop 类
+class RainDrop {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.length = Math.random() * 20 + 10; // 雨滴长度
+    this.speed = Math.random() * 4 + 2; // 雨滴下落速度
+    this.opacity = alpha.value; // 雨滴透明度
+  }
+
+  update() {
+    this.y += this.speed;
+
+    // 雨滴移出画布时重置
+    if (this.y > canvas.height) {
+      this.y = Math.random() * -50; // 从画布顶部重新开始
+      this.x = Math.random() * canvas.width;
+      this.length = Math.random() * 20 + 10;
+      this.speed = Math.random() * 4 + 2;
+      this.opacity = alpha.value;
+    }
+  }
+
+  draw() {
+    ctx.strokeStyle = generateRandomColor()
+    ctx.lineWidth = 1; // 雨滴宽度
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x, this.y + this.length);
+    ctx.stroke();
+  }
+}
+
+// 处理雨滴
+const handleRainDrops = () => {
+  for (let i = 0; i < rainDrops.length; i++) {
+    rainDrops[i].update();
+    rainDrops[i].draw();
+  }
 };
 
 onMounted(() => {
@@ -59,7 +112,7 @@ onMounted(() => {
   video.setAttribute("preload", "auto");
   video.setAttribute("disablePictureInPicture", "true");
   video.setAttribute('autoplay', 'autoplay');
-  video.setAttribute('loop','loop')
+  video.setAttribute('loop', 'loop');
 
   canvas = document.querySelector("canvas");
   ctx = canvas.getContext("2d");
@@ -68,7 +121,7 @@ onMounted(() => {
   updateCanvasSize();
 
   video?.addEventListener("canplay", function () {
-    watermark.value = ''
+    watermark.value = '';
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -80,7 +133,7 @@ onMounted(() => {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // 生成随机文字
-        if (draw.value == "A" || draw.value == "C") {
+        if (draw.value == "randomText" || draw.value == "randomTextAndGraphics") {
           const randomText = generateRandomText(10);
           ctx.font = "20px Arial";
           ctx.fillStyle = generateRandomColor();
@@ -89,8 +142,8 @@ onMounted(() => {
           ctx.fillText(randomText, x, y);
         }
 
-        // 生成随机方块
-        if (draw.value == "B" || draw.value == "C") {
+        // 生成随机方块和圆形
+        if (draw.value == "randomGraphics" || draw.value == "randomTextAndGraphics") {
           const squareX = Math.random() * canvas.width;
           const squareY = Math.random() * canvas.height;
           const squareWidth = Math.random() * 100 + 20;
@@ -98,6 +151,19 @@ onMounted(() => {
           const squareColor = generateRandomColor();
           ctx.fillStyle = squareColor;
           ctx.fillRect(squareX, squareY, squareWidth, squareHeight);
+
+          // 生成随机圆形
+          ctx.beginPath();
+          ctx.arc(Math.random() * canvas.width, Math.random() * canvas.width, Math.random() * 100 + 20, 0, 2 * Math.PI);
+          ctx.fillStyle = generateRandomColor();
+          ctx.fill();
+        }
+
+        
+
+        // 绘制雨滴
+       if (draw.value == "rain") {
+          handleRainDrops();
         }
 
         // 绘制图片
@@ -114,62 +180,6 @@ onMounted(() => {
     }
 
     drawFrame();
-  });
-
-  // 鼠标按下事件处理
-  canvas.addEventListener("mousedown", function (e) {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    resizeDirection = checkResizeArea(mouseX, mouseY);
-    if (resizeDirection) {
-      isResizingImg = true;
-    } else if (
-      img.complete &&
-      shouldDrawImage &&
-      mouseX >= imgX &&
-      mouseX <= imgX + imgWidth &&
-      mouseY >= imgY &&
-      mouseY <= imgY + imgHeight
-    ) {
-      isDraggingImg = true;
-    }
-    startImgX = mouseX;
-    startImgY = mouseY;
-  });
-
-  // 鼠标移动事件处理
-  canvas.addEventListener("mousemove", function (e) {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    if (isDraggingImg) {
-      const dx = mouseX - startImgX;
-      const dy = mouseY - startImgY;
-      imgX += dx;
-      imgY += dy;
-      startImgX = mouseX;
-      startImgY = mouseY;
-    } else if (isResizingImg) {
-      const dx = mouseX - startImgX;
-      const dy = mouseY - startImgY;
-      if (resizeDirection === "bottom-right") {
-        imgWidth += dx;
-        imgHeight += dy;
-      }
-      startImgX = mouseX;
-      startImgY = mouseY;
-    } else {
-      const direction = checkResizeArea(mouseX, mouseY);
-      canvas.style.cursor = direction ? "nwse-resize" : "default";
-    }
-  });
-
-  // 鼠标松开事件处理
-  canvas.addEventListener("mouseup", function () {
-    isDraggingImg = false;
-    isResizingImg = false;
-    canvas.style.cursor = "default";
   });
 });
 
@@ -207,16 +217,21 @@ unlisten = listen("smartscene", (event) => {
       alpha.value = event.payload.alpha;
       // document.querySelector("video").src = event.payload.src;
       // document.querySelector("video").play();
-      video.src  = event.payload.src
-      console.log(event.payload)
-      video.play()
+      video.src = event.payload.src;
+      console.log(event.payload);
+      video.play();
       break;
     case "resetplay":
       // document.querySelector("video").currentTime = 0;
       // document.querySelector("video").play();
-      video.currentTime = 0
-      video.play()
+      video.currentTime = 0;
+      video.play();
       break;
+    case 'setRainNumber':
+      numberOfRainDrops.value = event.payload.num;
+      console.log(numberOfRainDrops.value)
+      // rainDrops=[]
+      adjustRainDrops()
   }
 });
 
@@ -243,27 +258,13 @@ function generateRandomColor() {
   return `rgba(${r}, ${g}, ${b}, ${alpha.value})`;
 }
 
-// 检查鼠标是否在调整区域
-function checkResizeArea(mouseX, mouseY) {
-  const resizeThreshold = 10;
-  if (
-    mouseX >= imgX + imgWidth - resizeThreshold &&
-    mouseX <= imgX + imgWidth &&
-    mouseY >= imgY + imgHeight - resizeThreshold &&
-    mouseY <= imgY + imgHeight
-  ) {
-    return "bottom-right";
-  }
-  return "";
-}
-
 // 清除图片的函数
 const clearImage = () => {
   shouldDrawImage = false;
 };
 </script>
 
-<style >
+<style>
 .container {
   position: relative;
   margin: 0 auto;
@@ -302,7 +303,7 @@ video {
   white-space: normal;
   word-wrap: break-word;
 }
-body{
+body {
   overflow: hidden;
 }
 </style>
