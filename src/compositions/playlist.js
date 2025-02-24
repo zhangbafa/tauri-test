@@ -75,8 +75,6 @@ class AudioPlaylist {
                     audioSource = await fetchSpeech(text,model_id);
                     this.currentAudioURL = URL.createObjectURL(audioSource);
                     this.audio.src = this.currentAudioURL;
-                    // this.audio.src = 'aiapi/voice?text=22&model_id=1&speaker_id=0&sdp_ratio=0.2&noise=0.2&noisew=0.9&length=1&auto_translate=false&auto_split=false&style_weight=0.7'
-                    // this.audio.src=wav01
                     emit('addLog',{time:new Date().toLocaleString(),role:'主播',logtext:text})
 
                 } catch (error) {

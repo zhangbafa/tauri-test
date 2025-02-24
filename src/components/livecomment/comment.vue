@@ -12,12 +12,13 @@
                         </a-avatar>
                         <a-link @click="handleOpenUrl(item.secUid)" :hoverable="false"
                             style="margin-left: 10px;margin-right:  10px;">{{ item.nickName }}</a-link>
-                        <span v-show="item.type == 1" style="color: red;">
+                        <span style="color: red;">
                             {{ item.content }}
                         </span>
-                        <span v-show="item.type == 5">送出了 {{ item.giftName }}</span>
-                        <span v-show="item.type == 3">进入直播间</span>
                         <span v-show="item.type == 2">点赞:{{ item.count }}个,直播间共有{{ item.total }}个点赞</span>
+                        <span v-show="item.type == 3">进入直播间</span>
+                        <span v-show="item.type == 4">关注了主播</span>
+                        <span v-show="item.type == 5">送出了 {{ item.giftName }}</span>
                         <template #actions>
                             <icon-play-circle-fill size="22" @click="handlePlayHudong(item)" />
                         </template>

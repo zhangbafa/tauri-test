@@ -64,9 +64,11 @@
                   <a-card title="互动消息" style="margin:20px 0;height: 58vh;">
                     <template #extra>
                       <a-space>
-                        <a-checkbox>礼物</a-checkbox>
-                        <a-checkbox>点赞</a-checkbox>
-                        <a-checkbox>进入直播间</a-checkbox>
+                        <a-checkbox-group :default-value="['2','3','5']" v-model="filetercomment" @change="handleFilterComment">
+                        <a-checkbox :value="5">礼物</a-checkbox>
+                        <a-checkbox :value="2">点赞</a-checkbox>
+                        <a-checkbox :value="3">进入直播间</a-checkbox>
+                      </a-checkbox-group>
                         <a-divider direction="vertical" />
                         <a-checkbox v-model="savelivecomment" @change="handleSaveLiveComment">保存评论</a-checkbox>
                         <a-link @click="handleOpenCommentTXT">打开文件</a-link>
@@ -127,7 +129,6 @@ import { useSocket } from "@/compositions/useSocket.js";
 import { useForWithDelay } from "@/compositions/useForWithDelay.js";
 import { useInterval } from "@/compositions/useInterval.js";
 import { useAudioPlayer } from "@/compositions/useAudioPlayer.js";
-import { replayText, shortText } from "@/data/shortText.js";
 import outputDevice from '@/components/devices/outputDevice.vue'
 import outputIndex from '@/components/devices/index.vue'
 // 异步加载组件
@@ -191,8 +192,8 @@ const { category_id = 1, category_name = "默认直播间" } = params.query;
 document.title = category_name;
 const timeRange = ref([70, 90]);
 const selectedModels = ref({anchor_model: '0', assistant_model: '0', report_model: '1'});
-const { connectWebSocket, disconnectWebSocket, hudongList, currentCount, totalViewersCount, giftList, setSaveComment } =
-  useSocket();
+const { connectWebSocket, disconnectWebSocket, hudongList, currentCount, totalViewersCount, filterCommentList, setSaveComment } =
+  useSocket(category_name);
 const { fetchSpeech } = useForWithDelay();
 const { startPeriodicExecution, stopPeriodicExecution } =
   useInterval(timeRange);
@@ -448,8 +449,13 @@ onUnmounted(() => {
 
 });
 
-// 保存评论
+/**
+ * 弹幕处理开始
+ */
+
+// 保存弹幕
 const savelivecomment = ref(false)
+const filetercomment = ref([2,3,5])
 // openDirectory
 import { useFS } from '@/compositions/useFS.js'
 const { openDirectory, createIfNotExists, generateDateTimeFilename } = useFS()
@@ -459,12 +465,18 @@ const handleSaveLiveComment = async (e) => {
   await createIfNotExists(category_name)
   setSaveComment(`${category_name}/${commentFilename}`, e)
 }
-
-
 const handleOpenCommentTXT = async () => {
   const result = await openDirectory(category_name, `${commentFilename}`)
   if (!result) Message.error('打开错误')
 }
+
+const handleFilterComment=(value)=>{
+  console.log(filetercomment.value)
+  filterCommentList(value)
+}
+/**
+ * 弹幕处理结束
+ */
 </script>
 
 

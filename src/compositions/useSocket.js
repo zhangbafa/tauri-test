@@ -6,7 +6,7 @@ import favicon from '@/assets/favicon.png'
 import {useFS} from '@/compositions/useFS.js'
 const {writeText} = useFS() 
 
-export function useSocket(maxListSize = 20) {
+export function useSocket(liveName,maxListSize = 20) {
   let socket;
   let reconnectInterval = 5000;  // 重连间隔，单位：毫秒
   let heartbeatInterval = 30000;  // 心跳间隔，单位：毫秒
@@ -17,9 +17,11 @@ export function useSocket(maxListSize = 20) {
   const hudongList        = ref([]);
   const currentCount      = ref(0);
   const totalViewersCount = ref(0)
-  // 保存评论
+  // 保存弹幕
   const saveComment       = ref(false)
   const filename          = ref()
+  // 过滤弹幕
+  const filterComment     = ref([2,3,5])
   // 消息缓存队列
   const messageQueue = ref([]);
   // 创建一个防抖函数，每1秒更新一次，但不丢失消息
@@ -87,7 +89,7 @@ export function useSocket(maxListSize = 20) {
       // 1[普通弹幕]，2[点赞消息]，3[进入直播间]，4[关注消息]，5[礼物消息]，6[统计消息]，7[粉丝团消息]，8[直播间分享]，9[下播]
       switch (originalMsg.Type) {
         case 1: // 普通弹幕
-          if (message.User?.Nickname !== '国货之光') {
+          if (message.User?.Nickname !== liveName) {
             newMessage= {
               type: 1,
               msgId: message.MsgId,             
@@ -102,34 +104,38 @@ export function useSocket(maxListSize = 20) {
               writeText(filename.value,`${newMessage.nickName}::${newMessage.content}\r\n`)
             }
 
-            // 将互动消息推送给互动模块
+            // 将互动消息推送给助播模块
             emit('assistantInteraction',{content:newMessage.content})
             
             
           }          
           break;
         case 2: // 点赞消息
-          newMessage= {
-            type: 2,
-            msgId: message.MsgId,
-            content: message.Content,
-            nickName: message.User?.Nickname ?? '',
-            avatar: message.User?.HeadImgUrl ?? favicon,
-            secUid: message.User?.SecUid,
-            count:message.Count,
-            total:message.Total
+          if(filterComment.value.includes(2)){
+            newMessage= {
+              type: 2,
+              msgId: message.MsgId,
+              content: '',
+              nickName: message.User?.Nickname ?? '',
+              avatar: message.User?.HeadImgUrl ?? favicon,
+              secUid: message.User?.SecUid,
+              count:message.Count,
+              total:message.Total
+            }
           }
+          
           break;  
         case 3: // 进入直播间消息
-          newMessage= {
-            type: 3,
-            msgId: message.MsgId,
-            nickName: message.User?.Nickname,
-            avatar: message.User?.HeadImgUrl??favicon,
-            content: '',
-            secUid: message.User?.SecUid
-          }  
-          // console.log(message)
+          if(filterComment.value.includes(3)){
+            newMessage= {
+              type: 3,
+              msgId: message.MsgId,
+              nickName: message.User?.Nickname,
+              avatar: message.User?.HeadImgUrl??favicon,
+              content: '',
+              secUid: message.User?.SecUid
+            }  
+          }
           currentCount.value = message.CurrentCount;
           break;  
         case 4: // 关注消息
@@ -143,14 +149,16 @@ export function useSocket(maxListSize = 20) {
           }  
           break; 
         case 5: // 礼物消息
-          newMessage= {
-            type: 5,
-            msgId: message.MsgId,
-            giftName: message.GiftName,
-            avatar: message.ImgUrl ?? favicon,
-            nickName: message.User.Nickname,
-            content: message.Content,
-            secUid: message.User?.SecUid
+          if(filterComment.value.includes(5)){
+            newMessage= {
+              type: 5,
+              msgId: message.MsgId,
+              giftName: message.GiftName,
+              avatar: message.ImgUrl ?? favicon,
+              nickName: message.User.Nickname,
+              content: message.Content,
+              secUid: message.User?.SecUid
+            }
           }
           break
         case 6: // 统计消息
@@ -225,6 +233,10 @@ export function useSocket(maxListSize = 20) {
     saveComment.value = value
   }
 
+  function filterCommentList(value){
+    filterComment.value = value
+  }
+
   // 使用 Vue 生命周期钩子清理资源
   onUnmounted(() => {
     disconnectWebSocket();
@@ -244,6 +256,7 @@ export function useSocket(maxListSize = 20) {
     hudongList,
     currentCount,
     totalViewersCount,
-    setSaveComment
+    setSaveComment,
+    filterCommentList
   };
 }
