@@ -35,7 +35,9 @@
       <a-button type="primary" @click="handleStartLive">重新播放</a-button>
       <!-- <a-button type="primary" status="danger" @click="handleStop">暂停播放</a-button> -->
     </a-space>
-    <div class="canvas-box"></div>
+    <div class="canvas-box">
+      <a-button @click="handleShowMark">showMarks</a-button>
+    </div>
   </a-form-item>
 
 </template>
@@ -47,7 +49,7 @@ import { useWindow } from '@/compositions/useWindow';
 import { Message } from '@arco-design/web-vue'
 import { convertFileSrc } from '@tauri-apps/api/core'
 const { createNewWindow } = useWindow();
-
+import goods from '@/assets/pro.jpeg'
 const form = reactive({
   videoPath: "",
   deduplicated: "randomTextAndGraphics",
@@ -66,7 +68,7 @@ const handleSetRainNumber= ()=>{
 const handleCreateWindow = () => {
   if (!form.videoPath) {
     Message.error('没有一个视频文件')
-    return false
+    // return false
   }
   createNewWindow('#/video', '畅语智景')
   const a = convertFileSrc(form.videoPath)
@@ -92,7 +94,7 @@ const handleSelectVideo = async () => {
       filters: [
         {
           name: "视频文件",
-          extensions: ["mp4", "mov", "mkv", 'ts'],
+          extensions: ["mp4", "mov", "mkv", 'ts','png'],
         },
       ],
     });
@@ -110,7 +112,8 @@ const handleChangeAlpha = (e) => {
 }
 
 const handleShowMark = () => {
-  emit('show-marks')
+  const img = convertFileSrc(form.videoPath)
+  emit('show-marks',{type:'image',img:img})
 }
 
 const handleStop = ()=>{

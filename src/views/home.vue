@@ -7,11 +7,15 @@
         <a-row :gutter="20">
           <a-col :span="12" v-for="item in category" :key="item.id" style="margin-bottom: 15px;cursor: pointer;">
             <a-card hoverable @click="handleNav(item)">
-              <a-dropdown trigger="contextMenu" alignPoint :style="{display:'block'}">
-              <div  style="display: flex;justify-content: space-between;width: 100%;padding: 15px 10px;align-items: center;">
+              <a-dropdown trigger="contextMenu" alignPoint :style="{display:'block'}"> 
+                <div style="margin-left: 12px;">
+                  <!-- <img src="http://www.chinalotus.com.cn/favicon.ico" alt=""> -->
+                </div>
+              <div  style="display: flex;justify-content: space-between;width: 96%;padding: 15px 10px;align-items: center;">
+               
                 <div @focus="handleFocus" style="font-weight: bold;width: 80%;padding: 6px;font-size: 16px;">{{ item.category_name }}</div>
-                <div style="font-size:18px;margin-right: 15px;">
-                  <icon-right />
+                <div style="font-size:18px;margin-right: 15px;display: flex;align-items: center;">
+                  <icon-right /> 
                 </div>
               </div>
               <template #content>
@@ -70,7 +74,6 @@
 <script setup>
 import { ref,onMounted } from 'vue'
 import dbManager from '@/db/index.js'
-import logo from '@/assets/128x128@2x.png'
 import { useRouter } from 'vue-router'
 import {Message} from '@arco-design/web-vue'
 const router = useRouter()
@@ -202,6 +205,17 @@ const initializeData = async () => {
     'category_id': 'INTEGER'
   });
 
+  // 检查 time_script 表中是否已经存在 meidatype 和 meidapath 字段
+  const columns = await dbManager.query("PRAGMA table_info(time_script)");
+  const columnNames = columns.map(column => column.name);
+
+  if (!columnNames.includes('meidatype')) {
+    await dbManager.execute('ALTER TABLE time_script ADD COLUMN meidatype TEXT');
+  }
+
+  if (!columnNames.includes('meidapath')) {
+    await dbManager.execute('ALTER TABLE time_script ADD COLUMN meidapath TEXT');
+  }
   
 
   const result = await dbManager.query('select count(*) as count from category')
@@ -222,7 +236,7 @@ const initializeData = async () => {
   justify-content: center;
   flex-direction: column;
   background-image: linear-gradient(
-    180deg, 
+    -165deg, 
     #FFECE8,
     #ffffff 20%
   );

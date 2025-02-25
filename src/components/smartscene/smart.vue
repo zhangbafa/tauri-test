@@ -1,20 +1,57 @@
 <template>
   <a-watermark :content="watermark">
     <div class="container">
+      <div class="show-mark" v-show="hasBeenToggled"
+      :class="getAnimationClasses">
+        <img :src="showMedia" alt="">
+      </div>
       <canvas id="canvas"></canvas>
     </div>
   </a-watermark>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, reactive } from "vue";
+import { ref, onMounted, onUnmounted, reactive, computed } from "vue";
 import { listen } from "@tauri-apps/api/event";
-import logo from "@/assets/128x128@2x.png";
-
+import pro from '@/assets/pro.jpeg'
 // show marks
-const showmarks = ref(true);
-listen("show-marks", () => {
-  showmarks.value = !showmarks.value;
+const showMedia = ref(true);
+const isShowMarkVisible = ref(false)
+const hasBeenToggled = ref(false)
+const animationDirection = ref('right')
+// 定义计算属性 getAnimationClasses
+const getAnimationClasses = computed(() => {
+  // hasBeenToggled.value = true
+  const classes = {};
+  if (hasBeenToggled.value) {
+    switch (animationDirection.value) {
+      case 'right':
+        classes['slide-in-right'] = isShowMarkVisible.value;
+        classes['slide-out-right'] =!isShowMarkVisible.value;
+        break;
+      case 'left':
+        classes['slide-in-left'] = isShowMarkVisible.value;
+        classes['slide-out-left'] =!isShowMarkVisible.value;
+        break;
+      case 'zoom':
+        classes['zoom-in'] = isShowMarkVisible.value;
+        classes['zoom-out'] =!isShowMarkVisible.value;
+        break;
+    }
+  }
+  return classes;
+});
+
+let durationTimer;
+listen("show-marks", (event) => {
+  if(durationTimer) clearTimeout(durationTimer)
+  hasBeenToggled.value = true
+  const { type, img } = event.payload
+  isShowMarkVisible.value = !isShowMarkVisible.value;
+  showMedia.value = img
+  durationTimer = setTimeout(()=>{
+    isShowMarkVisible.value = !isShowMarkVisible.value
+  }, 5 * 1000)
 });
 
 let video;
@@ -30,18 +67,7 @@ const form = reactive({
 });
 const watermark = ref('畅语智景,视频正在加载中...');
 
-// 图片相关变量
-const img = new Image();
-img.src = logo;
-let imgX = 0;
-let imgY = 0;
-let imgWidth;
-let imgHeight;
-let isDraggingImg = false;
-let isResizingImg = false;
-let resizeDirection = "";
-let startImgX;
-let startImgY;
+
 let shouldDrawImage = true;
 
 // 雨滴相关变量
@@ -159,10 +185,10 @@ onMounted(() => {
           ctx.fill();
         }
 
-        
+
 
         // 绘制雨滴
-       if (draw.value == "rain") {
+        if (draw.value == "rain") {
           handleRainDrops();
         }
 
@@ -232,12 +258,14 @@ unlisten = listen("smartscene", (event) => {
       console.log(numberOfRainDrops.value)
       // rainDrops=[]
       adjustRainDrops()
+
   }
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateCanvasSize);
   unlisten();
+  if(durationTimer) clearTimeout(durationTimer)
 });
 
 function generateRandomText(length) {
@@ -269,18 +297,29 @@ const clearImage = () => {
   position: relative;
   margin: 0 auto;
 }
+
 .show-mark {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 200px;
-  height: 300px;
+  width:80%;
+  /* height: 400px; */
   z-index: 100;
-  transform: translate(-50%, -50%);
   border: none;
-  background-color: transparent;
-  border: 1px solid red;
+  /* background-color: red; */
+  border-radius: 10px;
+  /* border: 1px solid red; */
+  pointer-events: none;
+  transform: translate(-50%, -50%); 
+  overflow: hidden;
 }
+
+
+.show-mark img {
+  width: 100%;
+  height: auto;
+}
+
 video {
   width: 100%;
   height: 100%;
@@ -288,22 +327,105 @@ video {
   display: none;
 }
 
-.uni {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  color: rgba(238, 231, 231, 0.6);
-  font-size: 20px;
-  font-weight: bold;
-  text-align: center;
-  line-height: 1.5;
-  z-index: 1;
-  white-space: normal;
-  word-wrap: break-word;
-}
 body {
   overflow: hidden;
 }
+/* 从右到左进入动画 */
+.slide-in-right {
+  animation: slideInFromRight 0.2s ease forwards;
+}
+
+/* 从右到左离开动画 */
+.slide-out-right {
+  animation: slideOutToRight 0.2s ease forwards;
+}
+
+/* 从左到右进入动画 */
+.slide-in-left {
+  animation: slideInFromLeft 0.2s ease forwards;
+}
+
+/* 从左到右离开动画 */
+.slide-out-left {
+  animation: slideOutToLeft 0.2s ease forwards;
+}
+
+/* 从中间放大进入动画 */
+.zoom-in {
+  animation: zoomIn 0.2s ease forwards;
+}
+
+/* 从中间缩小离开动画 */
+.zoom-out {
+  animation: zoomOut 0.2s ease forwards;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%) translateY(-50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(-50%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(-50%) translateY(-50%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%) translateY(-50%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-200%) translateY(-50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(-50%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(-50%) translateY(-50%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-200%) translateY(-50%);
+    opacity: 0;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomOut {
+  from {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+}
+</style>
+<style>
+
 </style>

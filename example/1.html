@@ -1,0 +1,57 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .box{
+            padding: 3vmin;
+            background-color: #fff;
+            border-radius: 1vmin;
+            color: red;
+            font-size: 5vmin;
+            position: relative;
+            overflow: hidden;
+            z-index: 0;
+            width: 300px;
+            height: 200px;
+            border: 3px solid green
+        }
+        .box::after{
+            content: '';
+            position: absolute;
+            inset: 3px;
+            
+            background-color: #fff;
+            border-radius: 1vmin;
+            z-index: -1;
+        }
+        .box::before{
+            content:'' ;
+            width: 200%;
+            height: 200%;
+            background-color: #fff;
+            position: absolute;
+            left: -50%;
+            top: -50%;           
+            z-index: -2;
+            
+        }
+        .box:hover{
+            border:none
+        }
+        .box:hover::before {
+            background-image: conic-gradient(transparent,#66ddf7,transparent 30%);
+            animation: rotate 2s linear infinite;
+        }
+        @keyframes rotate{
+            to{
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="box">dddd</div>
+</body>
+</html>

@@ -7,6 +7,8 @@ export function useWindow() {
     const createNewWindow = async (url,title,label='video',options = {}) => {
         try {
             const defaultOptions = {
+                x: 0,
+                y: 0,
                 url: url,
                 title: title,
                 width: 1080/2,
