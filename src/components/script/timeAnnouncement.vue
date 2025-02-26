@@ -14,7 +14,9 @@
                 </a-button>
                 </a-popconfirm>
             </template>
-            <div style="margin: 0 auto; width:100%;position: relative;">
+            <div style="margin: 0 auto; width:100%;position: relative;">   
+              <a-input type="text" v-model="item.paster_path" placeholder="输入贴片路径" />
+              <a-divider direction="vertical" />           
               <a-textarea v-model="item.content" placeholder="请输入主播话术" :max-length="150" :auto-size="{maxRows:5,minRows:2}" allow-clear
              @focus="handleFocus(item.id)"
                 show-word-limit />
@@ -84,7 +86,7 @@ import { ref } from "vue";
 import { Message } from "@arco-design/web-vue";
 import dbManager from "@/db/index.js";
 import { emit } from "@tauri-apps/api/event";
-
+import { open } from "@tauri-apps/plugin-dialog";
 const props = defineProps({
   liveid: {
     type: String,
@@ -109,6 +111,8 @@ const handleAdd =  () => {
   const data = {
       content: "默认话术",
       type: "",
+      paster_path:'',
+      paster_type:'image',
       category_id: props.liveid,
     };
   anchor_script.value.push(data)
@@ -132,8 +136,8 @@ const handleEdit = async (item) => {
   try {
     if(item?.id){
       await dbManager.execute(
-        "UPDATE time_script SET content = ? WHERE id = ?",
-        [item.content, item.id]
+        "UPDATE time_script SET content = ?,paster_path=?,paster_type='image' WHERE id = ?",
+        [item.content, item.paster_path,item.id]
       );
     }else{
       await dbManager.insert("time_script", item);

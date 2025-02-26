@@ -35,11 +35,34 @@
       <a-button type="primary" @click="handleStartLive">重新播放</a-button>
       <!-- <a-button type="primary" status="danger" @click="handleStop">暂停播放</a-button> -->
     </a-space>
-    <div class="canvas-box">
-      <a-button @click="handleShowMark">showMarks</a-button>
-    </div>
+    
   </a-form-item>
-
+  <div class="canvas-box">
+    <a-button @click="handleShowMark">showMarks</a-button>
+  </div>
+  <div>
+    <a-list>
+    <a-list-item v-for="(item,idx) in paster" :key="idx">
+      <a-list-item-meta
+        :title="item.content"
+      >
+        <template #avatar>
+          <a-avatar shape="square">
+            <img
+              alt="贴片"
+              :src="'/@fs/'+item.paster_path"
+            />
+            <!--  -->
+          </a-avatar>
+        </template>
+      </a-list-item-meta>
+      <template #actions>
+        <a-button @click="handleShowPaster(item)">显示</a-button>
+      </template>
+    </a-list-item>
+  </a-list>
+  
+  </div>
 </template>
 <script setup>
 import { reactive,ref } from "vue";
@@ -48,8 +71,9 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { useWindow } from '@/compositions/useWindow';
 import { Message } from '@arco-design/web-vue'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import dbManager from "@/db/index.js";
 const { createNewWindow } = useWindow();
-import goods from '@/assets/pro.jpeg'
+
 const form = reactive({
   videoPath: "",
   deduplicated: "randomTextAndGraphics",
@@ -68,7 +92,7 @@ const handleSetRainNumber= ()=>{
 const handleCreateWindow = () => {
   if (!form.videoPath) {
     Message.error('没有一个视频文件')
-    // return false
+    return false
   }
   createNewWindow('#/video', '畅语智景')
   const a = convertFileSrc(form.videoPath)
@@ -94,7 +118,7 @@ const handleSelectVideo = async () => {
       filters: [
         {
           name: "视频文件",
-          extensions: ["mp4", "mov", "mkv", 'ts','png'],
+          extensions: ["mp4", "mov", "mkv", 'ts'],
         },
       ],
     });
@@ -111,11 +135,21 @@ const handleChangeAlpha = (e) => {
   emit('smartscene', { action: 'setAlpha', alpha: e })
 }
 
-const handleShowMark = () => {
-  const img = convertFileSrc(form.videoPath)
-  emit('show-marks',{type:'image',img:img})
+const paster = ref([])
+const handleShowMark = async() => {
+  const result = await dbManager.query(`select * from time_script where category_id=2 AND (paster_path IS NOT NULL AND paster_path != '')`);
+  paster.value = result.map(item => ({
+    content: item.content,
+    paster_path: (item.paster_path)
+}));
+  // paster.value = result
+  // const img = convertFileSrc(form.videoPath)
+  // emit('show-marks',{type:'image',img:img})
 }
 
+const handleShowPaster = (item) =>{
+  emit('show-marks',{type:'image',img:item.paster_path})
+}
 const handleStop = ()=>{
   emit('smartscene', { action: 'pause'})
 }
@@ -131,7 +165,7 @@ video {
 .canvas-box {
   padding: 2px;
   background-color: antiquewhite;
-  margin-left: 100px
+  /* margin-left: 100px */
 }
 
 .canvas {

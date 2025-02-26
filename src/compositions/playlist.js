@@ -51,7 +51,7 @@ class AudioPlaylist {
                 this.currentIndex = 0;
             }
             this.play();
-        }, 1000);  // 2秒延迟
+        }, 100);  // 2秒延迟
     }
     play(model_id=0) {
         if (this.isPlaying || this.currentIndex >= this.audioList.length) {

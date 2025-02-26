@@ -209,12 +209,12 @@ const initializeData = async () => {
   const columns = await dbManager.query("PRAGMA table_info(time_script)");
   const columnNames = columns.map(column => column.name);
 
-  if (!columnNames.includes('meidatype')) {
-    await dbManager.execute('ALTER TABLE time_script ADD COLUMN meidatype TEXT');
+  if (!columnNames.includes('paster_type')) {
+    await dbManager.execute('ALTER TABLE time_script ADD COLUMN paster_type TEXT');
   }
 
-  if (!columnNames.includes('meidapath')) {
-    await dbManager.execute('ALTER TABLE time_script ADD COLUMN meidapath TEXT');
+  if (!columnNames.includes('paster_path')) {
+    await dbManager.execute('ALTER TABLE time_script ADD COLUMN paster_path TEXT');
   }
   
 

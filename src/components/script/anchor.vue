@@ -15,7 +15,7 @@
                 </a-popconfirm>
             </template>
             <div style="margin: 0 auto; width:100%;position: relative;">
-              <a-textarea v-model="item.content" placeholder="请输入主播话术" :max-length="150" :auto-size="{maxRows:5,minRows:2}" allow-clear
+              <a-textarea v-model="item.content" placeholder="请输入主播话术" :max-length="200" :auto-size="{maxRows:5,minRows:2}" allow-clear
              @focus="handleFocus(item.id)"
                 show-word-limit />
             </div>
