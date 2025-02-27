@@ -105,9 +105,9 @@
         <a-divider orientation="left">背景音乐</a-divider>
         <bgm />
       </a-tab-pane>
-      <a-tab-pane key="7" title="智景" style="height: 95vh;overflow-y: auto;">
+      <a-tab-pane key="7" title="智景播放器" style="height: 95vh;overflow-y: auto;">
         <div style="padding: 10px">
-          <smartscene />
+          <smartscene :liveid="category_id"/>
         </div>
       </a-tab-pane>
     </a-tabs>
@@ -212,6 +212,7 @@ const audioUrl = ref(null);  // 用于存储动态生成的音频 URL
  */
 // 停止报时
 const handleStop = () => { };
+import { convertFileSrc } from '@tauri-apps/api/core'
 // 开始报时
 const timeScript = ref([])
 const handleAutoStart = async (e) => {
@@ -241,6 +242,9 @@ const handleAutoStart = async (e) => {
         text,
         selectedModels.value.report_model
       );
+      // 显示当前话术配置的贴片
+      emit('show-marks',{type:temp.paster_type,path:convertFileSrc(temp.paster_path)})
+      console.log({type:temp.paster_type,path:temp.paster_path})
       await playBlob(audioBlob);
     });
   } else {
@@ -373,7 +377,7 @@ let unsetSinkId
     Message.success('主播刷术刷新成功')
   });
   unrefreshTimeAnnouncementList = await listen("refreshTimeAnnouncementList", async () => {
-    timeScript.value = await dbManager.query('select * from time_script')
+    timeScript.value = await dbManager.query('select * from time_script where category_id=?',[category_id])
     Message.success('报时刷术刷新成功')
   });
   unanchorVolume = await listen('setAnchorVolume', async (event) => {

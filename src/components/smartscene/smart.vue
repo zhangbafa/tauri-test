@@ -1,9 +1,9 @@
 <template>
   <a-watermark :content="watermark">
     <div class="container">
-      <div class="show-mark" v-show="hasBeenToggled"
-      :class="getAnimationClasses">
-        <img :src="showMedia" alt="">
+      <div class="show-mark" v-show="hasBeenToggled" :class="getAnimationClasses">
+        <img v-show="pasterType == 'image'" :src="showMedia" alt="" />
+        <video v-show="pasterType == 'video'" id="pasterVideo" muted />
       </div>
       <canvas id="canvas"></canvas>
     </div>
@@ -13,12 +13,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted, reactive, computed } from "vue";
 import { listen } from "@tauri-apps/api/event";
-import pro from '@/assets/pro.jpeg'
 // show marks
 const showMedia = ref(true);
 const isShowMarkVisible = ref(false)
 const hasBeenToggled = ref(false)
-const animationDirection = ref('right')
+const animationDirection = ref('zoom')
 // 定义计算属性 getAnimationClasses
 const getAnimationClasses = computed(() => {
   // hasBeenToggled.value = true
@@ -27,15 +26,15 @@ const getAnimationClasses = computed(() => {
     switch (animationDirection.value) {
       case 'right':
         classes['slide-in-right'] = isShowMarkVisible.value;
-        classes['slide-out-right'] =!isShowMarkVisible.value;
+        classes['slide-out-right'] = !isShowMarkVisible.value;
         break;
       case 'left':
         classes['slide-in-left'] = isShowMarkVisible.value;
-        classes['slide-out-left'] =!isShowMarkVisible.value;
+        classes['slide-out-left'] = !isShowMarkVisible.value;
         break;
       case 'zoom':
         classes['zoom-in'] = isShowMarkVisible.value;
-        classes['zoom-out'] =!isShowMarkVisible.value;
+        classes['zoom-out'] = !isShowMarkVisible.value;
         break;
     }
   }
@@ -43,15 +42,39 @@ const getAnimationClasses = computed(() => {
 });
 
 let durationTimer;
+const pasterType = ref('')
 listen("show-marks", (event) => {
-  if(durationTimer) clearTimeout(durationTimer)
-  hasBeenToggled.value = true
-  const { type, img } = event.payload
+  const { type, path } = event.payload
+  showMedia.value = ''
+  hasBeenToggled.value = true  
+  pasterType.value = type
+  if (durationTimer) clearTimeout(durationTimer)
+
   isShowMarkVisible.value = !isShowMarkVisible.value;
-  showMedia.value = img
-  durationTimer = setTimeout(()=>{
-    isShowMarkVisible.value = !isShowMarkVisible.value
-  }, 5 * 1000)
+  showMedia.value = path
+  if (pasterType.value == 'image') {
+    durationTimer = setTimeout(() => {
+      isShowMarkVisible.value = !isShowMarkVisible.value
+    }, 5 * 1000)
+  }else{
+   
+    const pasterVideo = document.getElementById('pasterVideo')
+    console.log(pasterVideo)
+    pasterVideo.controls = false;
+    pasterVideo.setAttribute("playsinline", "playsinline");
+    pasterVideo.setAttribute("preload", "auto");
+    pasterVideo.setAttribute("disablePictureInPicture", "true");
+    pasterVideo.setAttribute('autoplay', false);
+    pasterVideo.setAttribute('src', path);
+    pasterVideo.setAttribute('muted',true)
+    pasterVideo.play()
+    pasterVideo.addEventListener('ended', function() {
+      console.log('视频播放结束');
+      isShowMarkVisible.value = false
+    });
+  }
+
+  // 
 });
 
 let video;
@@ -265,7 +288,7 @@ unlisten = listen("smartscene", (event) => {
 onUnmounted(() => {
   window.removeEventListener("resize", updateCanvasSize);
   unlisten();
-  if(durationTimer) clearTimeout(durationTimer)
+  if (durationTimer) clearTimeout(durationTimer)
 });
 
 function generateRandomText(length) {
@@ -302,34 +325,31 @@ const clearImage = () => {
   position: absolute;
   top: 50%;
   left: 50%;
-  width:80%;
-  /* height: 400px; */
+  width: 80%;
   z-index: 100;
   border: none;
-  /* background-color: red; */
   border-radius: 10px;
-  /* border: 1px solid red; */
   pointer-events: none;
-  transform: translate(-50%, -50%); 
+  transform: translate(-50%, -50%);
   overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 
 
-.show-mark img {
-  width: 100%;
+.show-mark img, .show-mark video  {
+  width: 50%;
   height: auto;
+  border-radius: 10px;
+  display: inline-block;
 }
 
-video {
-  width: 100%;
-  height: 100%;
-  opacity: 1;
-  display: none;
-}
+
 
 body {
   overflow: hidden;
 }
+
 /* 从右到左进入动画 */
 .slide-in-right {
   animation: slideInFromRight 0.2s ease forwards;
@@ -365,6 +385,7 @@ body {
     transform: translateX(100%) translateY(-50%);
     opacity: 0;
   }
+
   to {
     transform: translateX(-50%) translateY(-50%);
     opacity: 1;
@@ -376,6 +397,7 @@ body {
     transform: translateX(-50%) translateY(-50%);
     opacity: 1;
   }
+
   to {
     transform: translateX(100%) translateY(-50%);
     opacity: 0;
@@ -387,6 +409,7 @@ body {
     transform: translateX(-200%) translateY(-50%);
     opacity: 0;
   }
+
   to {
     transform: translateX(-50%) translateY(-50%);
     opacity: 1;
@@ -398,6 +421,7 @@ body {
     transform: translateX(-50%) translateY(-50%);
     opacity: 1;
   }
+
   to {
     transform: translateX(-200%) translateY(-50%);
     opacity: 0;
@@ -409,6 +433,7 @@ body {
     transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
+
   to {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
@@ -420,12 +445,10 @@ body {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
+
   to {
     transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
 }
-</style>
-<style>
-
 </style>
