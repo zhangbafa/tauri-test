@@ -1,3 +1,4 @@
+import { fetch } from "@tauri-apps/plugin-http";
 const buildUrl = (config) => {
     const queryParams = new URLSearchParams(
         Object.entries(config.params).map(([key, value]) => [key, String(value)])

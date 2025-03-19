@@ -3,12 +3,12 @@
         <a-col :span="16">
 
             <a-list :virtualListProps="{
-                height: 560,
-            }" :data="commentList">
+                height: 680,
+            }" :data="commentList" :bordered="false">
                 <template #item="{ item, index }">
                     <a-list-item :key="item.msgId">
                         <a-avatar shape="square">
-                            <img alt="avatar" :src="item.avatar" :size="30" />
+                            <img alt="avatar" :src="item.avatar" :size="20" />
                         </a-avatar>
                         <a-link @click="handleOpenUrl(item.secUid)" :hoverable="false"
                             style="margin-left: 10px;margin-right:  10px;">{{ item.nickName }}</a-link>
@@ -29,7 +29,7 @@
 
         </a-col>
         <a-col :span="8" style="position: relative;">
-            <a-list :data="assistant_reply" :virtualListProps="{
+            <!-- <a-list :data="assistant_reply" :virtualListProps="{
                 height: 400,
             }" >
                 <template #item="{ item, index }">
@@ -40,7 +40,7 @@
                         </template>
                     </a-list-item>
                 </template>
-            </a-list>
+            </a-list> -->
             <!-- <div style="position: absolute;right: 10px;bottom: -30px;cursor: pointer;">
                 <icon-sync :size="22" @click="handleRefresh" @hover="handleRefresh" />
             </div> -->
@@ -72,7 +72,7 @@ const { fetchSpeech, setTimeParseTime, processUsername } = useForWithDelay()
 const selectedModels = defineModel()
 const assistant_reply = ref([])
 const fetchData = async () => {
-    assistant_reply.value = await dbManager.query('select * from assistant_reply where type = 1')
+    assistant_reply.value = await dbManager.query('select * from assistant_reply')
 }
 fetchData()
 let unlisten;

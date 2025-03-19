@@ -4,9 +4,9 @@ import url from 'url'
 // 创建 HTTP 服务器
 const server = http.createServer((req, res) => {
     // 设置响应头以支持跨域请求
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // res.setHeader('Access-Control-Allow-Origin', '*');
+    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    // res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // 处理预检请求（OPTIONS 请求）
     if (req.method === 'OPTIONS') {

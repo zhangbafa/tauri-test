@@ -13,6 +13,7 @@ class AudioPlaylist {
         this.audio = new Audio();
         this.currentAudioURL = null
         this.timer = null
+        this.modelId;
         // 绑定方法到实例，避免多次创建函数引用
         this.handleAudioEnd = this.handleAudioEnd.bind(this);
         this.cyclicPicker = createCyclicPicker(this.audioList)
@@ -53,7 +54,9 @@ class AudioPlaylist {
             this.play();
         }, 100);  // 2秒延迟
     }
-    play(model_id=0) {
+    play() {
+        this.modelId = 2
+        console.log(`主播id:${this.modelId}`)
         if (this.isPlaying || this.currentIndex >= this.audioList.length) {
             return;
         }
@@ -72,7 +75,7 @@ class AudioPlaylist {
                 try {
                    // console.log(this.audioList)
                    // console.log(processTemplate(text))
-                    audioSource = await fetchSpeech(text,model_id);
+                    audioSource = await fetchSpeech(text,this.modelId);
                     this.currentAudioURL = URL.createObjectURL(audioSource);
                     this.audio.src = this.currentAudioURL;
                     emit('addLog',{time:new Date().toLocaleString(),role:'主播',logtext:text})

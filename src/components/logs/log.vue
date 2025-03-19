@@ -2,11 +2,11 @@
   <div style="margin-top: 10px;">
     <a-table
       :columns="columns"
-      :bordered="{wrapper: true, cell: true}"
+      :bordered="true"
       :data="data"
       :virtual-list-props="{ height: 200 }"
       :pagination="false"
-      :scroll="{ x: 0 }"
+      :scroll="{ x: '100%', y: true }"
     />
   </div>
 </template>
@@ -19,17 +19,18 @@ const columns = [
   {
     title: "时间",
     dataIndex: "time",
-    width: 180,
+    width: 160,
   },
   {
     title: "角色",
     dataIndex: "role",
-    width: 180,
+    width: 160,
   },
   {
     title: '日志',
     dataIndex: 'logtext',
-    ellipsis: true
+    ellipsis: true,
+    tooltip: true
   },
   
 ];
@@ -39,7 +40,7 @@ function addLogWithLimit(newLog, maxCount = 100) {
   const log = {
     time:newLog.time,
     role:newLog.role,
-    logtext:newLog.logtext.substring(0,60)+'...'
+    logtext:newLog.logtext
   }
   data.value.unshift(log); // 添加新日志
   if (data.value.length > maxCount) {

@@ -22,8 +22,10 @@ export function useSocket(liveName,maxListSize = 20) {
   const filename          = ref()
   // 过滤弹幕
   const filterComment     = ref([2,3,5])
+  // 主播收益
+  const diamondCount      = ref(0)
   // 消息缓存队列
-  const messageQueue = ref([]);
+  const messageQueue      = ref([]);
   // 创建一个防抖函数，每1秒更新一次，但不丢失消息
   const updateHudongList = debounce(() => {
     if (messageQueue.value.length > 0) {
@@ -160,6 +162,9 @@ export function useSocket(liveName,maxListSize = 20) {
               secUid: message.User?.SecUid
             }
           }
+          // 主播收益
+          console.log(message)
+          diamondCount.value = diamondCount.value + message.DiamondCount * message.RepeatCount
           break
         case 6: // 统计消息
         totalViewersCount.value = message.TotalUserCountStr;
@@ -256,6 +261,7 @@ export function useSocket(liveName,maxListSize = 20) {
     hudongList,
     currentCount,
     totalViewersCount,
+    diamondCount,
     setSaveComment,
     filterCommentList
   };

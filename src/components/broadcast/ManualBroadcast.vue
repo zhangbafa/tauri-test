@@ -34,8 +34,8 @@ const handleBroadcast = async () => {
 
 <style>
 .baoshi-box {
-  background-color: var(--color-fill-1);
-  border: 1px solid var(--color-fill-3);
+  
+  /* border: 1px solid var(--color-fill-3); */
   padding: 10px;
   border-radius: 5px;
 }

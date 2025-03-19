@@ -1,67 +1,80 @@
 <template>
   <div style="position: relative;">
-    <div style="position: absolute;top:0;right:0;z-index: 10;margin-top: 4px;">
+    <div style="position: absolute;top:0;right:0;z-index: 10;margin-top: 10px;margin-right: 15px">
       <a-space>
         <a-link :hoverable="false" style="margin-left: 10px;font-size: 12px;" href="/"><icon-left /> {{ category_name
         }}</a-link>
+        <a-divider direction="vertical" />
         <span style="font-size:12px">软件有效期至: 2025-10-10</span>
       </a-space>
     </div>
     <a-tabs default-active-key="1" type="line" size="large">
       <a-tab-pane key="1" style="height: 95vh;overflow-y: auto;">
-        <template #title> <icon-home /> 主控台 </template>
+        <template #title> <IconDesktop :size="16"/> 直播中控 </template>
         <div style="padding: 20px 10px">
 
-          <div style="display: flex; justify-content: space-between;padding: 10px">
+          <a-card style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between;">
             <a-space>
               <div class="baoshi-box">
-                <a-space>
-                  <a-switch v-model="enableAnchor" @change="handleKaiqi" checked-color="#F53F3F" />
-                  主播AI{{ enableAnchor ? "开启" : "关闭" }}
-                </a-space>
+                <a-switch v-model="enableAnchor" @change="handleKaiqi" checked-color="#F53F3F" />
+                主播AI{{ enableAnchor ? "开启" : "关闭" }}
               </div>
+              <a-divider direction="vertical" />
               <AssistantAI @update-bell-volume="handleUpdateBellVolume" @update-baoshi-volume="handleUpdateBaoshiVolume" :liveid="category_id"/>
-              <div class="baoshi-box">
-                <a-space>
-                  <a-switch @change="handleAutoStart" /> 自动报时
+              <a-divider direction="vertical" />
+              <a-switch @change="handleAutoStart" /> 自动报时
+              <a-divider direction="vertical" />
+              <a-switch @change="handleBell" /> 开启铃铛
+              <a-divider direction="vertical" />
+              
+            </a-space>
+            <a-space>
+              <a-switch @change="handleConnentDanMu" checked-color="#00B42A" /> 互动消息
                   <a-divider direction="vertical" />
-                  <a-switch @change="handleBell" /> 开启铃铛
-                </a-space>
-              </div>
-              <div class="ws-box">
-                <a-space>
-                  <a-switch @change="handleConnentDanMu" checked-color="#00B42A" /> 连接弹幕服务
-                  <a-divider direction="vertical" />
-                  直播间人数
+                  <IconUser />
+                  在线观众
                   <a-link :hoverable="false">{{ currentCount }}</a-link>
                   <a-divider direction="vertical" />
-                  累计观看人数
+                  <IconUserGroup />
+                  累计观看
                   <a-link :hoverable="false"> {{ totalViewersCount }}</a-link>
-                </a-space>
-              </div>
-            </a-space>
-            <a-space>
-              <speechservice />
+                  <template v-if="diamondCount>10">
+                    <a-divider direction="vertical" />
+                    <svg width="12" height="12" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M41 44V20H7V44H41Z" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 44V20" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 44H7" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="12" width="40" height="8" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/><path d="M16 4L24 12L32 4" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    礼物
+                    <a-link :hoverable="false" status="danger">{{ diamondCount }}</a-link>
+                  </template>
             </a-space>
           </div>
+          </a-card>
+
           <a-row>
             <a-col :span="24">
               <a-row :gutter="20">
-                <a-col :span="10">
-                  <a-divider orientation="left">插入播报</a-divider>
+                <a-col :span="10" >
+                  <!-- <div style="background-color: #fff;padding: 10px 10px 20px 10px;border-radius: 5px"> -->
+                    <a-card>
+                  <!-- <a-divider orientation="left"></a-divider> -->
+                  <h4 style="color: #333;">插入播报</h4>
                   <ManualBroadcast v-model="selectedModels" />
-                  <a-divider orientation="left">选择设备</a-divider>
+                  <!-- <a-divider orientation="left">选择设备</a-divider> -->
+                  <h4 style="color: #333;">选择设备</h4>
                   <outputDevice />
-                  <a-divider orientation="left">调音器</a-divider>
+                  <!-- <a-divider orientation="left">调音器</a-divider> -->
+                  <h4 style="color: #333;">调音器</h4>
                   <outputIndex />
                   <a-divider orientation="left"></a-divider>
                   <a-space>
+                    <speechservice/>
                     <managementmodel v-model="selectedModels" />
                     <rotationReportModel v-model="selectedModels"/>
                   </a-space>
+                </a-card>
+                  <!-- </div> -->
                 </a-col>
                 <a-col :span="14">
-                  <a-card title="互动消息" style="margin:20px 0;height: 58vh;">
+                  <a-card title="互动消息" style="height: 68vh;">
                     <template #extra>
                       <a-space>
                         <a-checkbox-group :default-value="['2','3','5']" v-model="filetercomment" @change="handleFilterComment">
@@ -69,8 +82,8 @@
                         <a-checkbox :value="2">点赞</a-checkbox>
                         <a-checkbox :value="3">进入直播间</a-checkbox>
                       </a-checkbox-group>
-                        <a-divider direction="vertical" />
-                        <a-checkbox v-model="savelivecomment" @change="handleSaveLiveComment">保存评论</a-checkbox>
+                        <!-- <a-divider direction="vertical" /> -->
+                        <a-checkbox v-model="savelivecomment" @change="handleSaveLiveComment">保存消息</a-checkbox>
                         <a-link @click="handleOpenCommentTXT">打开文件</a-link>
                       </a-space>
                     </template>
@@ -192,7 +205,7 @@ const { category_id = 1, category_name = "默认直播间" } = params.query;
 document.title = category_name;
 const timeRange = ref([70, 90]);
 const selectedModels = ref({anchor_model: '0', assistant_model: '0', report_model: '1'});
-const { connectWebSocket, disconnectWebSocket, hudongList, currentCount, totalViewersCount, filterCommentList, setSaveComment } =
+const { connectWebSocket, disconnectWebSocket, hudongList,  filterCommentList, setSaveComment,currentCount, totalViewersCount,diamondCount } =
   useSocket(category_name);
 const { fetchSpeech } = useForWithDelay();
 const { startPeriodicExecution, stopPeriodicExecution } =
@@ -340,7 +353,8 @@ const handleKaiqi = () => {
   // 安全播放
   if (enableAnchor.value) {
     if (audioList.value) {
-      audioList.value.play(selectedModels.value.anchor_model ?? 0);
+      console.log(`startzhubo:${selectedModels.value.anchor_model}`)
+      audioList.value.play(selectedModels.value.anchor_model);
     } else {
       console.warn("音频播放列表未初始化");
     }
@@ -438,11 +452,11 @@ const startAIService = async (e) => {
 // 组件挂载时自动初始化
 onMounted(() => {
   initializeAudioPlaylist()
-  // startAIService()
+  startAIService()
   if (import.meta.env.DEV) { }
 });
 onBeforeUnmount(async () => {
-  // await stopHttpServer()
+  await stopHttpServer()
 })
 onUnmounted(() => {
   audioList.value?.destroy();
@@ -486,15 +500,16 @@ const handleFilterComment=(value)=>{
 
 <style>
 .ws-box {
-  background-color: var(--color-fill-1);
-  border: 1px solid var(--color-fill-3);
+  /* background-color: var(--color-fill-1);
+  border: 1px solid var(--color-fill-3); */
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 5px; background-color: white;
 }
 
 .baoshi-box {
-  background-color: var(--color-fill-1);
-  border: 1px solid var(--color-fill-3);
+  /* background-color: var(--color-fill-1);
+  border: 1px solid var(--color-fill-3); */
+  background-color: white;
   padding: 10px;
   border-radius: 5px;
 }

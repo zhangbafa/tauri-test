@@ -9,14 +9,14 @@ const constantRouterMap = [
     path: "/",
     name: "index",
     redirect:'/index',
-    // component: Layout,
+    component: Layout,
     children: [
       {
         path: "/index",
         name: "Index",
-        component: () => import("@/views/home.vue"),
+        component: () => import("@/views/dashboard.vue"),
         meta: {
-          ignoreCache: false,
+          ignoreCache: true,
         },
       },
     ],
@@ -24,7 +24,7 @@ const constantRouterMap = [
   {
     path: "/dashboard",
     name: "dashboard",
-    // component: Layout,
+    component: Layout,
     children: [
       {
         path: "/dashboard",
@@ -39,7 +39,7 @@ const constantRouterMap = [
   {
     path: "/lab",
     name: "lab",
-    // component: Layout,
+    component: Layout,
     redirect: "/lab/welcome",
     children: [
       {
@@ -67,7 +67,7 @@ const constantRouterMap = [
   {
     path: "/goods",
     name: "goods",
-    // component: Layout,
+    component: Layout,
     children: [
       {
         path: "/goods",

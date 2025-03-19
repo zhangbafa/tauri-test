@@ -56,7 +56,7 @@ class DBManager {
       if (!this.db) {
         await this.init();
       }
-      return await this.db.select(sql, params);
+      return await this.db.select('select * from category', params);
     } catch (error) {
       console.error('SQL query failed:', error);
       throw error;

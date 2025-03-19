@@ -1,261 +1,173 @@
 <template>
-  <div class="container">
-    <div class="app-name">
-      <!-- <h1 style="text-align: left;">选择你的直播间</h1> -->
-    </div>
-  <div style="width: 70%;margin: 0 auto;">
-        <a-row :gutter="20">
-          <a-col :span="12" v-for="item in category" :key="item.id" style="margin-bottom: 15px;cursor: pointer;">
-            <a-card hoverable @click="handleNav(item)">
-              <a-dropdown trigger="contextMenu" alignPoint :style="{display:'block'}"> 
-                <div style="margin-left: 12px;">
-                  <!-- <img src="http://www.chinalotus.com.cn/favicon.ico" alt=""> -->
-                </div>
-              <div  style="display: flex;justify-content: space-between;width: 96%;padding: 15px 10px;align-items: center;">
-               
-                <div @focus="handleFocus" style="font-weight: bold;width: 80%;padding: 6px;font-size: 16px;">{{ item.category_name }}</div>
-                <div style="font-size:18px;margin-right: 15px;display: flex;align-items: center;">
-                  <icon-right /> 
-                </div>
-              </div>
-              <template #content>
-                <a-doption @click.stop="handleEditModel(item)">
-                  <template #icon>
-                    <icon-edit />
-                  </template>
-                  <template #default>编辑</template>
-                </a-doption>
-                <a-doption @click.stop="handleCreate(item)">
-                  <template #icon>
-                    <icon-plus />
-                  </template>
-                  <template #default>添加</template>
-                </a-doption>
-                <a-doption @click.stop="handleDelete(item,'delete')">
-                    <template #icon>
-                    <icon-delete />
-                  </template>
-                  <template #default>删除</template>
-                  
-                </a-doption>
-              </template>
-            </a-dropdown>
-             
-              
-            </a-card>
-          </a-col>
-        </a-row>
+  <div class="home-container">
+    <div class="debug-panel">
+      <h3>Debug Events</h3>
+      <div class="debug-logs">
+        <div v-for="(log, index) in debugLogs" :key="index" class="log-item">
+          {{ log }}
+        </div>
       </div>
+      <div class="debug-status">
+        <p>监听器状态: {{ listenerStatus }}</p>
+        <p>最后更新时间: {{ lastUpdateTime }}</p>
+      </div>
+    </div>
   </div>
-  <a-drawer :width="340" :header="false" :visible="visible" placement="bottom" unmountOnClose @ok="handleOk"
-  @cancel="handleCancel" :footer="true">
-    <template #title>
-      Title
-    </template>
-    <div style="padding-top: 40px" v-if="!isDelete">
-      <a-form :style="{ width: '600px',margin:'0 auto' }">
-        <a-form-item field="name" label="直播间名称">
-          <a-input
-            v-model="category_name"
-            placeholder=""
-          />
-        </a-form-item>
-        <a-form-item>
-          <a-button type="primary" @click="handleSave">保存</a-button>
-        </a-form-item>
-      </a-form>
-    </div>
-    <div v-else>
-      <h1>是否确认删除？</h1>
-    </div>
-  </a-drawer>
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue'
-import dbManager from '@/db/index.js'
-import { useRouter } from 'vue-router'
-import {Message} from '@arco-design/web-vue'
-const router = useRouter()
-// 
-const show = ref(false)
-const category = ref([])
-const category_name = ref('')
-// 
-const handleFocus=()=>{
-  show.value = true
-}
-onMounted(async ()=>{
-  initializeData()
-       
-})
+import { ref, onMounted, onUnmounted } from 'vue';
+import { listen } from '@tauri-apps/api/event';
+import { invoke } from '@tauri-apps/api/core';
 
-const selectid = ref(0)
-const visible = ref(false)
-const handleEditModel=(item)=>{
-  visible.value = true
-  selectid.value = item.id
-  category_name.value = item.category_name
-}
-const handleCreate=()=>{
-  visible.value = true
-  selectid.value = ''
-  category_name.value = ''
-}
-const handleSave= async ()=>{
-  if(selectid.value){
-    const result = await dbManager.update('category',{
-        category_name:category_name.value
-      },{
-        id:selectid.value
-      })
-      //{lastInsertId: 0, rowsAffected: 1}
-      if(result.rowsAffected){
-        category.value = await dbManager.query('select * from category')
-        visible.value = false
-      }
-  }else{
-      await dbManager.insert('category', {
-      'category_name': category_name.value
-      })  
-      category.value = await dbManager.query('select * from category')
-      visible.value = false
-  }
-  
+const debugLogs = ref([]);
+const listenerStatus = ref('未初始化');
+const lastUpdateTime = ref('无');
+let debugEventUnlisten = null;
 
-}
-const isDelete = ref(false)
-const handleDelete=(item,type)=>{
-  selectid.value = item.id
-  if(item.id==1){
-    Message.error('不能删除')
-    return false
-  }
-  isDelete.value = true
-  visible.value = true
-}
-const handleOk = async () => {
-  const result = await dbManager.delete('category',{id:selectid.value})
-  category.value = await dbManager.query('select * from category')
-  visible.value = false;
-};
-const handleCancel = () => {
-  visible.value = false;
-  selectid.value = ''
-  isDelete.value = false
-}
-const handleNav = (item)=>{
-  router.push({
-    path: '/dashboard',
-    query: {
-      category_id: item.id,
-      category_name: item.category_name
+const requestData = {
+  "model": "ep-20250127160955-q86q2",
+  "messages": [
+    {
+      "content": "你可以做啥",
+      "role": "user"
     }
-  })
+  ],
+  "max_tokens": 4096,
+  "stream": true,
+  "prompt": "你是一个专业的 AI 文档助手",
+  "n": 1,
+  "frequency_penalty": 0,
+  "presence_penalty": 0,
+  "repetition_penalty": 1,
+  "temperature": 1,
+  "top_p": 0.1,
+  "top_k": 10,
+  "min_p": 0.1,
+};
+
+// 添加日志的辅助函数
+function addLog(message) {
+  const timestamp = new Date().toLocaleTimeString();
+  debugLogs.value.push(`[${timestamp}] ${message}`);
+  lastUpdateTime.value = timestamp;
+  // 保持最新的100条日志
+  if (debugLogs.value.length > 100) {
+    debugLogs.value.shift();
+  }
 }
-const initializeData = async () => {
-  await dbManager.init()
-  // 调用 createTable 函数创建 category 表
-  await dbManager.createTable('category', {
-    'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-    'category_name': 'VARCHAR(10) NOT NULL',
-    'add_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-    'update_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-    'delete_flag': 'INTEGER DEFAULT 0'
-  });
 
-  // 调用 createTable 函数创建 anchor_script 表
-  await dbManager.createTable('anchor_script', {
-    'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-    'content': 'TEXT NOT NULL',
-    'type': 'TEXT',
-    'create_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-    'update_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-    'category_id': 'INTEGER'
-  });
-
-  // 调用 createTable 函数创建 assistant_reply 表
-  await dbManager.createTable('assistant_script', {
-    'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-    'keyword': 'TEXT NOT NULL',
-    'content': 'TEXT NOT NULL',
-    'category_id': 'INTEGER',
-    'type': 'INTEGER',
-    'create_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-    'update_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
-  });
-
-  // 调用 createTable 函数创建 system_config 表
-  await dbManager.createTable('system_config', {
-    'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-    'key': 'TEXT NOT NULL',
-    'value': 'TEXT NOT NULL',
-    'config_description': 'TEXT',
-    'create_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-    'update_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
-  });
-
-  // 调用 createTable 函数创建 system_config 表
-  await dbManager.createTable('time_script', {
-    'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-    'content': 'TEXT NOT NULL',
-    'type': 'TEXT',
-    'create_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-    'update_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-    'category_id': 'INTEGER'
-  });
-
-  // 检查 time_script 表中是否已经存在 meidatype 和 meidapath 字段
-  const columns = await dbManager.query("PRAGMA table_info(time_script)");
-  const columnNames = columns.map(column => column.name);
-
-  if (!columnNames.includes('paster_type')) {
-    await dbManager.execute('ALTER TABLE time_script ADD COLUMN paster_type TEXT');
+// 监听debug事件
+async function setupDebugEventListener() {
+  try {
+    addLog('开始设置debug事件监听器');
+    listenerStatus.value = '正在初始化';
+    
+    debugEventUnlisten = await listen('debug-event', (event) => {
+      addLog('收到新的事件数据');
+      
+      try {
+        let displayData;
+        if (typeof event.payload === 'string') {
+          try {
+            // 尝试解析JSON字符串
+            const parsed = JSON.parse(event.payload);
+            displayData = JSON.stringify(parsed, null, 2);
+          } catch {
+            // 如果不是JSON，直接显示字符串
+            displayData = event.payload;
+          }
+        } else {
+          // 如果是对象，格式化显示
+          displayData = JSON.stringify(event.payload, null, 2);
+        }
+        
+        addLog(`事件数据: ${displayData}`);
+      } catch (parseError) {
+        addLog(`事件数据解析错误: ${parseError.message}`);
+      }
+    });
+    
+    listenerStatus.value = '监听中';
+    addLog('debug事件监听器设置成功');
+  } catch (error) {
+    listenerStatus.value = '初始化失败';
+    addLog(`设置监听器失败: ${error.message}`);
+    console.error('设置debug事件监听器失败:', error);
   }
-
-  if (!columnNames.includes('paster_path')) {
-    await dbManager.execute('ALTER TABLE time_script ADD COLUMN paster_path TEXT');
-  }
-  
-
-  const result = await dbManager.query('select count(*) as count from category')
-  if(result[0].count==0){
-      await dbManager.insert('category', {
-      'category_name': '默认直播间'
-      })  
-  }
-  category.value = await dbManager.query('select * from category')
 }
+
+// 启动流式请求
+async function startDebugStream() {
+  try {
+    addLog('开始发起流式请求');
+    await invoke('fetchstream', {
+      url: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 8654bf2d-b682-477d-b74e-a6dcb1f0e2e7'
+      },
+      body: JSON.stringify(requestData),
+    });
+    addLog('流式请求发起成功');
+  } catch (error) {
+    addLog(`流式请求失败: ${error.message}`);
+    console.error('启动debug流失败:', error);
+  }
+}
+
+onMounted(async () => {
+  addLog('组件已挂载');
+//   await setupDebugEventListener();
+//   await startDebugStream();
+});
+
+onUnmounted(() => {
+  if (debugEventUnlisten) {
+    debugEventUnlisten();
+    addLog('事件监听器已清理');
+  }
+});
 </script>
 
 <style scoped>
-.container {
-  height: 100vh;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  background-image: linear-gradient(
-    -165deg, 
-    #FFECE8,
-    #ffffff 20%
-  );
+.home-container {
+  padding: 20px;
 }
-.app-name {
-  text-align: left;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start
+
+.debug-panel {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 16px;
+  height: 400px;
+  overflow-y: auto;
 }
-.app-name img{
-  /* text-align: center; */
-  width: 80px;
-  height: auto;
+
+.debug-logs {
+  font-family: monospace;
+  margin-bottom: 16px;
 }
-h1{
-  color: red;
+
+.log-item {
+  padding: 4px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
-:deep(.arco-card){
-  border-radius: 10px;
+
+.log-item:hover {
+  background-color: #e8e8e8;
+}
+
+.debug-status {
+  margin-top: 16px;
+  padding: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+.debug-status p {
+  margin: 4px 0;
+  font-family: monospace;
 }
 </style>
